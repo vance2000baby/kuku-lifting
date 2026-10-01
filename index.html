@@ -1,0 +1,1135 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F6F5F2" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#121211" media="(prefers-color-scheme: dark)">
+<title>酷酷擼鐵</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="酷酷擼鐵">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<script src="vendor/chart.umd.min.js"></script>
+<style>
+/* =========================================================
+   1. DESIGN TOKENS
+   ========================================================= */
+:root{
+  /* color — semantic */
+  --bg:#F6F5F2; --surface:#FFFFFF; --elevated:#FFFFFF;
+  --fill:#EFEEEA; --fill-2:#E4E2DC;
+  --text:#1C1C1A; --text-2:#5F5E59; --text-3:#97958F;
+  --border:#D9D7D1; --divider:#E9E7E2;
+  --primary:#1F6B4F; --primary-press:#17573F; --on-primary:#FFFFFF; --primary-soft:#E2EEE8;
+  --success:#237A4F; --warning:#A2650F; --warning-soft:#F7EAD2; --error:#BE3B28; --on-error:#FFFFFF;
+  --disabled:#C3C1BB; --scrim:rgba(20,20,18,.36);
+  /* data colors (charts only) */
+  --cat-legs:#C8553D; --cat-back:#3D6CA8; --cat-chest:#C29129; --cat-shoulder:#2E8559;
+  --cat-arms:#8467AE; --cat-core:#7B7974; --cat-other:#B4B2AC;
+  /* elevation — floating layers only */
+  --e1:0 1px 2px rgba(20,20,18,.06),0 10px 32px rgba(20,20,18,.14);
+  /* spacing */
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:20px; --s6:24px; --s7:32px; --s8:40px;
+  /* radius */
+  --r-sm:10px; --r-md:14px; --r-lg:20px; --r-full:999px;
+  /* type */
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang TC","Noto Sans TC","Noto Sans CJK TC","Microsoft JhengHei",Roboto,"Helvetica Neue",sans-serif;
+  /* layout */
+  --tab-h:56px; --dock-h:64px; --page-max:600px;
+  --safe-b:env(safe-area-inset-bottom,0px);
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121211; --surface:#1C1C1A; --elevated:#262624; --fill:#2A2A27; --fill-2:#34342F;
+    --text:#F2F1EE; --text-2:#A9A7A1; --text-3:#75736E; --border:#3B3A36; --divider:#2B2A27;
+    --primary:#62C095; --primary-press:#4FAA81; --on-primary:#0D1A13; --primary-soft:#1D3228;
+    --success:#6CC79A; --warning:#E2A647; --warning-soft:#392D17; --error:#EF7A66; --on-error:#1C0D0A;
+    --disabled:#55534F; --scrim:rgba(0,0,0,.55);
+    --cat-legs:#E07A63; --cat-back:#6E98D3; --cat-chest:#DDB04E; --cat-shoulder:#5DB585; --cat-arms:#A88BD1; --cat-core:#9A9893; --cat-other:#5E5C58;
+    --e1:0 1px 2px rgba(0,0,0,.4),0 12px 36px rgba(0,0,0,.55);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121211; --surface:#1C1C1A; --elevated:#262624; --fill:#2A2A27; --fill-2:#34342F;
+  --text:#F2F1EE; --text-2:#A9A7A1; --text-3:#75736E; --border:#3B3A36; --divider:#2B2A27;
+  --primary:#62C095; --primary-press:#4FAA81; --on-primary:#0D1A13; --primary-soft:#1D3228;
+  --success:#6CC79A; --warning:#E2A647; --warning-soft:#392D17; --error:#EF7A66; --on-error:#1C0D0A;
+  --disabled:#55534F; --scrim:rgba(0,0,0,.55);
+  --cat-legs:#E07A63; --cat-back:#6E98D3; --cat-chest:#DDB04E; --cat-shoulder:#5DB585; --cat-arms:#A88BD1; --cat-core:#9A9893; --cat-other:#5E5C58;
+  --e1:0 1px 2px rgba(0,0,0,.4),0 12px 36px rgba(0,0,0,.55);
+  color-scheme:dark;
+}
+
+/* typography scale */
+.t-display{font:700 34px/40px var(--font);letter-spacing:-.005em}
+.t-h1{font:700 28px/34px var(--font)}
+.t-h2{font:600 20px/26px var(--font)}
+.t-h3{font:600 17px/22px var(--font)}
+.t-body{font:400 17px/24px var(--font)}
+.t-callout{font:400 15px/20px var(--font)}
+.t-caption{font:400 13px/18px var(--font)}
+.t-label{font:500 13px/16px var(--font)}
+.num{font-variant-numeric:tabular-nums}
+.c2{color:var(--text-2)} .c3{color:var(--text-3)}
+.good{color:var(--success)} .bad{color:var(--error)}
+
+/* =========================================================
+   2. BASE
+   ========================================================= */
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%;touch-action:manipulation}
+/* the page only ever scrolls vertically */
+html,body{overflow-x:hidden;overflow-x:clip;overscroll-behavior-x:none;max-width:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:400 17px/24px var(--font);-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased}
+h1,h2,h3,p{margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;touch-action:manipulation}
+:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+svg{display:block}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+.page{max-width:var(--page-max);margin:0 auto;padding:0 var(--s4) calc(var(--tab-h) + var(--safe-b) + var(--s7))}
+body.has-dock .page{padding-bottom:calc(var(--tab-h) + var(--dock-h) + var(--safe-b) + var(--s7))}
+
+/* =========================================================
+   3. COMPONENTS
+   ========================================================= */
+/* Button */
+.btn{min-height:48px;padding:0 var(--s4);border:0;border-radius:var(--r-sm);display:inline-flex;align-items:center;justify-content:center;gap:var(--s2);font:600 17px/22px var(--font);white-space:nowrap;transition:background-color .12s}
+.btn svg{width:20px;height:20px;flex:none}
+.btn-primary{background:var(--primary);color:var(--on-primary)}
+.btn-primary:active{background:var(--primary-press)}
+.btn-secondary{background:var(--fill);color:var(--text)}
+.btn-secondary:active{background:var(--fill-2)}
+.btn-plain{min-height:44px;padding:0 var(--s2);background:none;color:var(--primary);font-weight:500}
+.btn-plain:active{opacity:.6}
+.btn-destructive{background:none;color:var(--error);font-weight:500}
+.btn-block{width:100%}
+.btn:disabled{background:var(--fill);color:var(--disabled);cursor:default}
+.iconbtn{width:44px;height:44px;flex:none;border:0;background:none;border-radius:var(--r-sm);display:grid;place-items:center;color:var(--text-2);position:relative}
+.iconbtn svg{width:22px;height:22px}
+.iconbtn:active{background:var(--fill)}
+
+/* Page header */
+.ph{padding:var(--s3) 0 var(--s3)}
+.ph-row{display:flex;align-items:center;justify-content:space-between;gap:var(--s2);min-height:44px}
+.ph-act{display:flex;align-items:center;margin-right:calc(var(--s3) * -1)}
+.ph-sub{margin-top:var(--s1)}
+.back{margin-left:calc(var(--s2) * -1);gap:2px}
+.back svg{width:20px;height:20px}
+
+/* Section + group + row */
+.sec{margin-top:var(--s7)}
+.sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:var(--s3);padding:0 var(--s1) var(--s2)}
+.group{background:var(--surface);border-radius:var(--r-md);overflow:hidden}
+.pad{padding:var(--s4)}
+.row{position:relative;display:flex;align-items:center;gap:var(--s3);min-height:56px;padding:var(--s3) var(--s4);width:100%;border:0;background:none;text-align:left}
+button.row:active{background:var(--fill)}
+.row+.row::before,.row+.setw::before{content:"";position:absolute;top:0;left:var(--s4);right:0;height:1px;background:var(--divider)}
+.row-main{flex:1;min-width:0}
+.row-main>*{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row-end{flex:none;text-align:right}
+.chev{width:16px;height:16px;color:var(--text-3);flex:none}
+
+/* Segmented control */
+.seg{display:flex;background:var(--fill);border-radius:var(--r-sm);padding:2px;gap:2px}
+.seg button{flex:1;min-height:36px;border:0;background:none;border-radius:calc(var(--r-sm) - 2px);font:500 15px/20px var(--font);color:var(--text-2);padding:0 var(--s2)}
+.seg button[aria-pressed="true"]{background:var(--elevated);color:var(--text);box-shadow:0 1px 2px rgba(0,0,0,.1)}
+
+/* Choice grid (category) */
+.choices{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s2)}
+.choices button{min-height:44px;border:1px solid var(--border);background:var(--surface);border-radius:var(--r-sm);font:500 15px/20px var(--font);color:var(--text)}
+.choices button[aria-pressed="true"]{border-color:var(--primary);background:var(--primary-soft);color:var(--primary);font-weight:600}
+
+/* Inputs */
+.field{width:100%;min-height:48px;border:1px solid transparent;border-radius:var(--r-sm);background:var(--fill);padding:0 var(--s3);font:400 17px/24px var(--font)}
+.field:focus{outline:none;border-color:var(--primary);background:var(--surface)}
+textarea.field{padding:var(--s3);resize:vertical;min-height:96px}
+select.field{appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--text-3) 50%),linear-gradient(135deg,var(--text-3) 50%,transparent 50%);background-position:calc(100% - 20px) 50%,calc(100% - 15px) 50%;background-size:5px 5px;background-repeat:no-repeat;padding-right:var(--s7)}
+.fl{display:block}
+.fl>.t-label{display:block;color:var(--text-2);margin:0 0 var(--s2) var(--s1)}
+.fl+.fl{margin-top:var(--s5)}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:var(--s4) var(--s3)}
+.fgrid .fl+.fl{margin-top:0}
+.unitfield{display:flex;align-items:center;background:var(--fill);border-radius:var(--r-sm);border:1px solid transparent;padding-right:var(--s3)}
+.unitfield:focus-within{border-color:var(--primary);background:var(--surface)}
+.unitfield input{flex:1;min-width:0;border:0;background:none;height:46px;padding:0 var(--s3);font:600 20px/26px var(--font);font-variant-numeric:tabular-nums}
+.unitfield input:focus{outline:none}
+.unitfield input::placeholder{color:var(--text-3);font-weight:400}
+.unitfield span{color:var(--text-3);font:400 15px/20px var(--font)}
+.hint{display:block;margin:var(--s1) 0 0 var(--s1)}
+
+/* Toggle */
+.toggle{position:relative;width:51px;height:31px;flex:none}
+.toggle input{position:absolute;inset:0;margin:0;opacity:0;cursor:pointer}
+.toggle span{position:absolute;inset:0;border-radius:var(--r-full);background:var(--fill-2);transition:background-color .2s;pointer-events:none}
+.toggle span::after{content:"";position:absolute;left:2px;top:2px;width:27px;height:27px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .2s}
+.toggle input:checked+span{background:var(--primary)}
+.toggle input:checked+span::after{transform:translateX(20px)}
+.toggle input:focus-visible+span{outline:2px solid var(--primary);outline-offset:2px}
+
+/* Tab bar */
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:10;background:var(--surface);border-top:1px solid var(--divider);padding-bottom:var(--safe-b)}
+.tabs-in{max-width:var(--page-max);margin:0 auto;display:flex}
+.tabs button{flex:1;height:var(--tab-h);border:0;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--text-3);font:500 12px/16px var(--font)}
+.tabs button svg{width:24px;height:24px}
+.tabs button[aria-current="page"]{color:var(--primary)}
+
+/* Dock (one floating layer above the tab bar) */
+.dock{position:fixed;left:0;right:0;bottom:calc(var(--tab-h) + var(--safe-b));z-index:9;background:var(--bg);border-top:1px solid var(--divider)}
+.dock[hidden]{display:none}
+.dock-in{position:relative;max-width:var(--page-max);margin:0 auto;height:var(--dock-h);display:flex;align-items:center;gap:var(--s2);padding:0 var(--s4)}
+.dock-in>.btn{min-height:48px}
+.dock .grow{flex:1}
+.timer-main{flex:1;min-width:0;display:flex;align-items:baseline;gap:var(--s3)}
+.timer-main b{font:600 28px/34px var(--font);font-variant-numeric:tabular-nums;min-width:72px}
+.timer-main span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.timer .btn{min-width:56px;padding:0 var(--s3);font-weight:500}
+.timer-bar{position:absolute;left:0;top:-1px;height:2px;background:var(--primary);transition:width .25s linear}
+.timer.done .timer-main b{color:var(--primary)}
+
+/* Bottom sheet */
+.scrim{position:fixed;inset:0;z-index:20;background:var(--scrim);opacity:0;pointer-events:none;transition:opacity .2s}
+.scrim.open{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;max-width:var(--page-max);margin:0 auto;max-height:90vh;display:flex;flex-direction:column;background:var(--bg);border-radius:var(--r-lg) var(--r-lg) 0 0;box-shadow:var(--e1);transform:translateY(105%);transition:transform .32s cubic-bezier(.32,.72,0,1);padding-bottom:var(--safe-b)}
+.sheet:not(.open){visibility:hidden;transition:transform .32s cubic-bezier(.32,.72,0,1),visibility 0s .32s}
+.sheet.open{transform:none}
+.sheet-top{flex:none;padding-top:var(--s2);touch-action:none}
+.grab{width:36px;height:5px;border-radius:var(--r-full);background:var(--border);margin:0 auto}
+.sheet-h{display:flex;align-items:center;justify-content:space-between;padding:var(--s2) var(--s2) var(--s2) var(--s4);min-height:52px}
+.sheet-b{overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:var(--s2) var(--s4) var(--s6)}
+.sheet-b>.group+.group,.sheet-b>.group+.sec-h{margin-top:var(--s6)}
+.actions .row{min-height:52px}
+
+/* Dialog */
+.dlg{position:fixed;inset:0;z-index:40;display:grid;place-items:center;padding:var(--s6);background:var(--scrim);opacity:0;pointer-events:none;transition:opacity .15s}
+.dlg.open{opacity:1;pointer-events:auto}
+.dlg-box{width:min(320px,100%);background:var(--elevated);border-radius:var(--r-lg);padding:var(--s6) var(--s5) var(--s4);box-shadow:var(--e1)}
+.dlg-acts{display:flex;gap:var(--s2);margin-top:var(--s5)}
+.dlg-acts .btn{flex:1}
+.btn-danger{background:var(--error);color:var(--on-error)}
+
+/* Toast */
+.toast{position:fixed;left:50%;bottom:calc(var(--tab-h) + var(--safe-b) + var(--s3));z-index:30;transform:translate(-50%,8px);width:min(calc(var(--page-max) - 32px),calc(100% - 32px));min-height:48px;display:flex;align-items:center;justify-content:space-between;gap:var(--s3);padding:0 var(--s2) 0 var(--s4);background:var(--text);color:var(--bg);border-radius:var(--r-sm);box-shadow:var(--e1);opacity:0;pointer-events:none;transition:opacity .18s,transform .18s}
+body.has-dock .toast{bottom:calc(var(--tab-h) + var(--dock-h) + var(--safe-b) + var(--s3))}
+.toast.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.toast button{min-height:44px;border:0;background:none;color:inherit;font:600 15px/20px var(--font);padding:0 var(--s3);text-decoration:underline;text-underline-offset:3px}
+
+/* Empty / loading */
+.empty{padding:var(--s8) var(--s4) var(--s6);text-align:center}
+.empty .t-callout{margin-top:var(--s2)}
+.sk{background:var(--fill);border-radius:var(--r-sm);animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.5}}
+.notice{display:flex;align-items:center;justify-content:space-between;gap:var(--s3);padding:var(--s3) var(--s4);background:var(--warning-soft);color:var(--text)}
+
+/* =========================================================
+   4. SCREEN-SPECIFIC
+   ========================================================= */
+/* week strip */
+.week{display:grid;grid-template-columns:32px repeat(7,1fr) 32px;align-items:center;margin:0 calc(var(--s2) * -1) var(--s2)}
+.week .wk-nav{width:32px;height:56px;border:0;background:none;color:var(--text-3);display:grid;place-items:center}
+.week .wk-nav svg{width:18px;height:18px}
+.day{height:56px;border:0;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0}
+.day span{font:400 13px/18px var(--font);color:var(--text-3)}
+.day b{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font:600 17px/22px var(--font);font-variant-numeric:tabular-nums}
+.day i{width:4px;height:4px;border-radius:50%;background:transparent}
+.day.has i{background:var(--text-3)}
+.day.today b{color:var(--primary)}
+.day[aria-current="date"] b{background:var(--text);color:var(--bg)}
+.calbtn input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
+
+/* exercise block */
+.exs{margin-top:var(--s4)}
+.exs-h{display:flex;align-items:flex-start;gap:var(--s2);padding:var(--s4) var(--s2) 0 var(--s4)}
+.exs-h .row-main{padding-top:var(--s1)}
+.exs-meta{padding:var(--s1) var(--s4) 0}
+.exs-meta p+p{margin-top:2px}
+.st-h,.set{display:grid;grid-template-columns:28px minmax(0,1.25fr) minmax(0,1fr) 44px;gap:var(--s2);align-items:center}
+.st-h{padding:var(--s4) var(--s4) var(--s1)}
+.st-h span:last-child{text-align:center}
+.setw{position:relative;overflow:hidden}
+.setw .del{position:absolute;right:0;top:0;bottom:0;width:88px;border:0;background:var(--error);color:var(--on-error);font:600 15px/20px var(--font)}
+.set{position:relative;touch-action:pan-y;background:var(--surface);padding:var(--s1) var(--s4);transition:transform .22s cubic-bezier(.32,.72,0,1)}
+.set.open{transform:translateX(-88px)}
+.idx{font:400 15px/20px var(--font);font-variant-numeric:tabular-nums;color:var(--text-3);text-align:center}
+.idx.pr{color:var(--warning);font-weight:600;font-size:13px}
+.nf{display:flex;align-items:center;height:44px;border-radius:var(--r-sm);background:var(--fill);min-width:0}
+.nf:focus-within{background:var(--surface);box-shadow:inset 0 0 0 2px var(--primary)}
+.nf input{flex:1;min-width:0;height:44px;border:0;background:none;padding:0 0 0 var(--s3);font:600 20px/26px var(--font);font-variant-numeric:tabular-nums}
+.nf input:focus{outline:none}
+.nf input::placeholder{color:var(--text-3);font-weight:400}
+.unit{flex:none;height:44px;min-width:40px;border:0;background:none;padding:0 var(--s2) 0 var(--s1);font:500 15px/20px var(--font);color:var(--text-3);text-decoration:underline dotted;text-underline-offset:4px;text-decoration-color:var(--border)}
+.unit.lb{color:var(--text)}
+.chk{width:44px;height:44px;border:0;background:none;display:grid;place-items:center;padding:0}
+.chk span{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);display:grid;place-items:center;color:var(--on-primary);transition:background-color .15s,border-color .15s,transform .15s}
+.chk svg{width:16px;height:16px}
+.set.done .chk span{background:var(--primary);border-color:var(--primary)}
+.chk:active span{transform:scale(.9)}
+.eff{grid-column:2/4;display:flex;align-items:center;justify-content:space-between;gap:var(--s2);min-height:28px;margin-top:-2px}
+.eff button{border:0;background:none;color:var(--primary);font:500 13px/18px var(--font);min-height:28px;padding:0 var(--s1)}
+.exs-f{padding:var(--s1) var(--s2) var(--s2)}
+.exs-f .btn-plain{gap:var(--s1)}
+.exs-f svg{width:18px;height:18px}
+.notice .btn-plain{min-height:36px;flex:none}
+
+/* stats row */
+.stats{display:grid;grid-template-columns:repeat(3,1fr)}
+.stats>div{padding:var(--s4) var(--s3) var(--s4) var(--s4);position:relative;min-width:0}
+.stats>div+div::before{content:"";position:absolute;left:0;top:var(--s4);bottom:var(--s4);width:1px;background:var(--divider)}
+.stats .t-h2{margin:var(--s1) 0 2px;white-space:nowrap}
+.cw{position:relative;height:200px}
+.metric-v{display:flex;align-items:baseline;gap:var(--s1);margin-top:var(--s1)}
+.btn-row{display:flex;gap:var(--s2)}
+.btn-row .btn{flex:1}
+
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<main class="page" id="app" aria-busy="true">
+  <div class="ph"><div class="ph-row"><div class="sk" style="width:96px;height:34px"></div></div></div>
+  <div class="sk" style="height:56px;margin-bottom:16px"></div>
+  <div class="sk" style="height:220px;border-radius:14px"></div>
+</main>
+<div class="dock" id="dock" hidden></div>
+<nav class="tabs" aria-label="主要導覽"><div class="tabs-in" id="tabs"></div></nav>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="dlg" id="dlg"></div>
+<div class="scrim" id="scrim" data-act="close"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle"></div>
+
+<script>
+/* =========================================================
+   CONSTANTS & HELPERS
+   ========================================================= */
+const LB=0.45359237;
+const CATS=['腿','背','胸','肩','手臂','核心','其他'];
+const CAT_VAR={'腿':'legs','背':'back','胸':'chest','肩':'shoulder','手臂':'arms','核心':'core','其他':'other'};
+const BODY_FIELDS=[['weight','體重','mass'],['fatPct','體脂率','%'],['muscle','骨骼肌重','mass'],['fatMass','體脂肪重','mass'],['visceral','內臟脂肪','級'],['bmr','基礎代謝','kcal']];
+const LOADS=[['single','單一重量'],['double','兩邊 ×2'],['assist','輔助']];
+const REST_OPTS=[30,45,60,75,90,120,150,180,240,300];
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const cssv=n=>getComputedStyle(document.documentElement).getPropertyValue('--'+n).trim();
+const pad=n=>String(n).padStart(2,'0');
+const ymd=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const todayStr=()=>ymd(new Date());
+const addDays=(s,n)=>{const d=new Date(s+'T00:00:00');d.setDate(d.getDate()+n);return ymd(d)};
+const md=s=>`${+s.slice(5,7)}/${+s.slice(8)}`;
+const mdLong=s=>`${+s.slice(5,7)}月${+s.slice(8)}日`;
+const WD='日一二三四五六';
+const wd=s=>WD[new Date(s+'T00:00:00').getDay()];
+const fmt=(n,dp=1)=>n==null||isNaN(n)?'–':(+n).toLocaleString('zh-TW',{maximumFractionDigits:dp});
+const num=v=>{const n=parseFloat(v);return isNaN(n)?null:n};
+const r1=v=>v==null?null:Math.round(v*10)/10;
+const e1rm=(w,r)=>!w||!r?0:(r===1?w:w*(1+r/30));
+const weekKey=s=>{const d=new Date(s+'T00:00:00');d.setDate(d.getDate()-((d.getDay()+6)%7));return ymd(d)};
+const fmtSec=s=>s<60?`${s} 秒`:`${Math.floor(s/60)}:${pad(s%60)}`;
+const clone=o=>JSON.parse(JSON.stringify(o));
+const haptic=ms=>{try{navigator.vibrate&&navigator.vibrate(ms)}catch{}};
+
+const IC={
+  plus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  x:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  more:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5.5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="18.5" cy="12" r="1.8"/></svg>',
+  chevR:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>',
+  chevL:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>',
+  cal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>',
+  gear:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.6 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>',
+  search:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/></svg>',
+  timer:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 13.5V10M9.5 2.5h5"/></svg>',
+  tTrain:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2.5 12h19M6.5 7.5v9M3.5 9.5v5M17.5 7.5v9M20.5 9.5v5"/></svg>',
+  tProg:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>',
+  tBody:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4.5" width="16" height="15.5" rx="3.5"/><path d="M8.5 10.5a3.5 3.5 0 0 1 7 0M12 10.5l1.6-2"/></svg>'
+};
+
+/* =========================================================
+   STATE & STORAGE
+   ========================================================= */
+let S={meta:{height:null,unit:'kg',rest:90,autoRest:false,exercises:{}},sessions:{},body:{}};
+let ui={tab:'train',date:todayStr(),range:90,prog:null,lastEx:null,newCat:null,newUnit:'kg',newLoad:'single',edit:null};
+let store=null;
+
+async function initStore(){
+  const K='gymlog-v1';
+  /* throws on failure (e.g. QuotaExceededError) so queue() can surface it */
+  const write=()=>localStorage.setItem(K,JSON.stringify(S));
+  store={kind:'local',async load(){try{return JSON.parse(localStorage.getItem(K))}catch{return null}},
+    saveMeta:write,saveSession:write,delSession:write,saveBody:write,delBody:write};
+}
+/* saving is silent; only failures surface */
+const timers={},pending={};
+function queue(key,fn){
+  clearTimeout(timers[key]);pending[key]=fn;
+  timers[key]=setTimeout(()=>runSave(key),500);
+}
+async function runSave(key){
+  const fn=pending[key];clearTimeout(timers[key]);delete pending[key];if(!fn)return;
+  try{await fn()}
+  catch(e){toast(e&&e.name==='QuotaExceededError'?'儲存空間已滿，請先匯出備份':'沒有存到，請再試一次');console.warn(e)}
+}
+/* write everything still waiting on the debounce (before reload, or when the app goes to background) */
+const flushSaves=()=>Promise.all(Object.keys(pending).map(runSave));
+const saveMeta=()=>queue('meta',()=>store.saveMeta(S.meta));
+function saveSession(id){
+  const s=S.sessions[id];
+  if(!s||!s.items.length){delete S.sessions[id];queue('s:'+id,()=>store.delSession(id))}
+  else queue('s:'+id,()=>store.saveSession(id,s));
+}
+const saveBodyRec=(d)=>S.body[d]?queue('b:'+d,()=>store.saveBody(d,S.body[d])):queue('b:'+d,()=>store.delBody(d));
+
+/* =========================================================
+   DOMAIN LOGIC (units, load types, history)
+   ========================================================= */
+const U=()=>S.meta.unit||'kg';
+const toKg=(w,u)=>w==null?null:(u==='lb'?w*LB:w);
+const fromKg=(kg,u)=>kg==null?null:(u==='lb'?kg/LB:kg);
+const setKg=x=>toKg(x.w,x.u||'kg');
+const showW=(kg,dp=1)=>fmt(fromKg(kg,U()),dp);
+const volTxt=kg=>{const v=fromKg(kg,U());return U()==='kg'&&v>=1000?`${fmt(v/1000,1)} 噸`:`${fmt(v,0)} ${U()}`};
+const exUnit=n=>S.meta.exercises[n]?.unit||U();
+const catOf=n=>S.meta.exercises[n]?.cat||'其他';
+const catColor=c=>cssv('cat-'+(CAT_VAR[c]||'other'));
+const loadType=n=>{const e=S.meta.exercises[n]||{};return e.load||(e.sides===2?'double':'single')};
+const sidesOf=n=>loadType(n)==='double'?2:1;
+const restFor=n=>(n&&S.meta.exercises[n]?.rest)||S.meta.rest||90;
+function bwOn(d){
+  const ks=Object.keys(S.body).filter(k=>S.body[k].weight!=null).sort();if(!ks.length)return null;
+  let pick=ks[0];for(const k of ks){if(k<=d)pick=k;else break}return S.body[pick].weight;
+}
+/* load actually moved (kg); assist = body weight − counterweight, or + when x.add */
+function effKg(name,x,date){
+  const kg=setKg(x);if(kg==null)return loadType(name)==='assist'?null:0;
+  if(loadType(name)!=='assist')return kg;
+  const bw=bwOn(date);if(bw==null)return null;
+  return x.add?bw+kg:bw-kg;
+}
+const isDone=x=>!!x.done&&!!x.r;
+function itemVol(it,date){const k=sidesOf(it.name);return it.sets.reduce((a,x)=>a+(isDone(x)?Math.max(0,effKg(it.name,x,date)||0)*x.r*k:0),0)}
+function sessionStats(s){
+  let vol=0,sets=0,ex=0;
+  (s?.items||[]).forEach(it=>{const n=it.sets.filter(isDone).length;if(n){ex++;sets+=n;vol+=itemVol(it,s.date)}});
+  return {vol,sets,ex,planned:(s?.items||[]).length};
+}
+const sessionDates=()=>Object.keys(S.sessions).filter(k=>S.sessions[k].items?.some(it=>it.sets.some(isDone))).sort();
+function exHistory(name){
+  return sessionDates().map(d=>{
+    const it=S.sessions[d].items.find(i=>i.name===name);if(!it)return null;
+    const valid=it.sets.filter(isDone);if(!valid.length)return null;
+    let top=0,topReps=0,best=0,vol=0;const k=sidesOf(name);
+    valid.forEach(x=>{const w=effKg(name,x,d)||0;if(w>top||(w===top&&x.r>topReps)){top=w;topReps=x.r}best=Math.max(best,e1rm(w,x.r));vol+=w*x.r*k});
+    return {date:d,top,topReps,e1rm:best,vol,sets:valid};
+  }).filter(Boolean);
+}
+const lastBefore=(n,d)=>{const h=exHistory(n).filter(x=>x.date<d);return h[h.length-1]||null};
+const maxBefore=(n,d)=>exHistory(n).filter(x=>x.date<d).reduce((a,x)=>Math.max(a,x.top),0);
+function allExercises(){
+  const seen=[];Object.keys(S.sessions).sort().reverse().forEach(d=>(S.sessions[d].items||[]).forEach(i=>{if(!seen.includes(i.name))seen.push(i.name)}));
+  Object.keys(S.meta.exercises).forEach(n=>{if(!seen.includes(n))seen.push(n)});
+  return seen;
+}
+function useCount(n){return Object.keys(S.sessions).filter(d=>S.sessions[d].items?.some(i=>i.name===n)).length}
+const inRange=d=>!ui.range||d>=addDays(todayStr(),-ui.range);
+function setsText(sets,name){
+  if(!sets.length)return '';
+  const as=loadType(name)==='assist', w=x=>`${as&&x.add?'+':''}${fmt(x.w??0)} ${x.u||'kg'}`;
+  const pre=as?(sets.every(x=>x.add)?'負重 ':sets.some(x=>x.add)?'':'輔助 '):'';
+  const same=sets.every(x=>w(x)===w(sets[0]));
+  return pre+(same?`${w(sets[0])} × ${sets.map(x=>x.r).join('、')}`:sets.map(x=>`${w(x)}×${x.r}`).join('、'));
+}
+/* placeholder for set j: the set above it in this session, else last session's set j */
+function placeholder(it,j,d){
+  const prev=it.sets[j-1];
+  if(prev&&(prev.w!=null||prev.r!=null))return {w:prev.w,r:prev.r,u:prev.u||'kg',add:prev.add};
+  const last=lastBefore(it.name,d);if(!last)return null;
+  const s=last.sets[j]||last.sets[last.sets.length-1];return {w:s.w,r:s.r,u:s.u||'kg',add:s.add};
+}
+const effTxt=(ek,x)=>x&&x.w==null?'–':ek==null?'需要體重紀錄':`${showW(ek)} ${U()}`;
+
+/* body */
+const isMass=k=>BODY_FIELDS.find(f=>f[0]===k)[2]==='mass';
+const bUnit=k=>{const u=BODY_FIELDS.find(f=>f[0]===k)[2];return u==='mass'?U():u};
+const bShow=(k,v)=>v==null?null:(isMass(k)?fromKg(v,U()):v);
+const bLabel=k=>BODY_FIELDS.find(f=>f[0]===k)[1];
+function seriesOf(k){return Object.keys(S.body).sort().filter(d=>S.body[d][k]!=null).map(d=>({d,v:S.body[d][k]}))}
+
+/* =========================================================
+   FEEDBACK: toast, dialog
+   ========================================================= */
+let toastT=null;
+function toast(msg,action){
+  const el=$('#toast');
+  el.innerHTML=`<span class="t-callout">${esc(msg)}</span>${action?`<button type="button">${esc(action.label)}</button>`:''}`;
+  if(action)el.querySelector('button').onclick=()=>{el.classList.remove('show');action.fn()};
+  el.classList.add('show');clearTimeout(toastT);
+  toastT=setTimeout(()=>el.classList.remove('show'),action?6000:2800);
+}
+function askConfirm(msg,ok='刪除'){
+  return new Promise(res=>{
+    const el=$('#dlg');
+    el.innerHTML=`<div class="dlg-box" role="alertdialog" aria-modal="true"><p class="t-body">${esc(msg)}</p>
+      <div class="dlg-acts"><button class="btn btn-secondary" data-r="0">取消</button><button class="btn btn-danger" data-r="1">${esc(ok)}</button></div></div>`;
+    el.classList.add('open');el.querySelector('[data-r="0"]').focus();
+    const done=v=>{el.classList.remove('open');el.onclick=null;res(v)};
+    el.onclick=e=>{const b=e.target.closest('[data-r]');if(b)done(b.dataset.r==='1');else if(e.target===el)done(false)};
+  });
+}
+
+/* =========================================================
+   BOTTOM SHEET (drag down to dismiss)
+   ========================================================= */
+let sheetPrevFocus=null;
+function openSheet(title,html,after){
+  const sh=$('#sheet');
+  sheetPrevFocus=document.activeElement;
+  sh.innerHTML=`<div class="sheet-top"><div class="grab"></div><div class="sheet-h"><h2 class="t-h3" id="sheetTitle">${title}</h2><button class="iconbtn" data-act="close" aria-label="關閉">${IC.x}</button></div></div><div class="sheet-b">${html}</div>`;
+  $('#scrim').classList.add('open');sh.classList.add('open');document.body.style.overflow='hidden';
+  bindSheetDrag(sh);
+  after&&after(sh);
+}
+function closeSheet(){
+  const sh=$('#sheet');if(!sh.classList.contains('open'))return;
+  $('#scrim').classList.remove('open');sh.classList.remove('open');document.body.style.overflow='';
+  try{sheetPrevFocus&&sheetPrevFocus.focus&&document.body.contains(sheetPrevFocus)&&sheetPrevFocus.focus({preventScroll:true})}catch{}
+}
+function bindSheetDrag(sh){
+  const top=sh.querySelector('.sheet-top');let y0=null,dy=0;
+  top.addEventListener('touchstart',e=>{if(e.target.closest('button'))return;y0=e.touches[0].clientY;dy=0;sh.style.transition='none'},{passive:true});
+  top.addEventListener('touchmove',e=>{if(y0==null)return;dy=Math.max(0,e.touches[0].clientY-y0);sh.style.transform=`translateY(${dy}px)`},{passive:true});
+  top.addEventListener('touchend',()=>{if(y0==null)return;sh.style.transition='';sh.style.transform='';if(dy>90)closeSheet();y0=null});
+}
+function actionSheet(title,items){
+  openSheet(esc(title),`<div class="group actions">${items.map(a=>`<button class="row" data-act="${a.act}" ${Object.entries(a.data||{}).map(([k,v])=>`data-${k}="${esc(v)}"`).join(' ')}><span class="row-main t-body ${a.danger?'bad':''}">${a.label}</span></button>`).join('')}</div>`);
+}
+
+/* =========================================================
+   SHELL
+   ========================================================= */
+const app=$('#app');
+const charts={};
+function render(){
+  Object.values(charts).forEach(c=>c.destroy());for(const k in charts)delete charts[k];
+  $('#tabs').innerHTML=[['train','訓練',IC.tTrain],['prog','進度',IC.tProg],['body','身體',IC.tBody]]
+    .map(([k,l,ic])=>`<button data-tab="${k}" ${ui.tab===k?'aria-current="page"':''}>${ic}${l}</button>`).join('');
+  app.removeAttribute('aria-busy');
+  ui.tab==='train'?renderTrain():ui.tab==='prog'?renderProg():renderBody();
+  updateDock();
+}
+const gearBtn=()=>`<button class="iconbtn" data-act="settings" aria-label="設定">${IC.gear}</button>`;
+function header(title,sub,actions=''){
+  return `<header class="ph"><div class="ph-row"><h1 class="t-h1">${title}</h1><div class="ph-act">${actions}${gearBtn()}</div></div>${sub?`<p class="ph-sub t-callout c2" id="sum">${sub}</p>`:''}</header>`;
+}
+
+/* =========================================================
+   SCREEN: 訓練
+   ========================================================= */
+function summaryText(d,st){
+  const t=todayStr();
+  const date=d===t?`${mdLong(d)} 週${wd(d)}`:`週${wd(d)}`;
+  if(st.sets)return `${date}　${st.ex} 個動作　${st.sets} 組　${volTxt(st.vol)}`;
+  if(st.planned)return `${date}　還沒有完成的組`;
+  return date;
+}
+function renderTrain(){
+  const d=ui.date,t=todayStr(),s=S.sessions[d]||{date:d,items:[]},st=sessionStats(s);
+  const title=d===t?'今天':d===addDays(t,-1)?'昨天':mdLong(d);
+  const wk=weekKey(d), days=Array.from({length:7},(_,i)=>addDays(wk,i));
+  const actions=`${d!==t?`<button class="btn btn-plain" data-act="today">今天</button>`:''}
+    <span class="iconbtn calbtn" aria-label="選擇日期">${IC.cal}<input type="date" id="dateIn" value="${d}" aria-label="選擇日期"></span>`;
+  const recent=allExercises().filter(n=>!s.items.some(i=>i.name===n)).slice(0,6);
+  app.innerHTML=`${header(title,summaryText(d,st),actions)}
+  <div class="week" role="group" aria-label="選擇日期">
+    <button class="wk-nav" data-act="week" data-n="-7" aria-label="上一週">${IC.chevL}</button>
+    ${days.map(x=>`<button class="day ${S.sessions[x]?.items?.length?'has':''} ${x===t?'today':''}" data-act="pick" data-d="${x}" ${x===d?'aria-current="date"':''} aria-label="${mdLong(x)} 週${wd(x)}"><span>${wd(x)}</span><b>${+x.slice(8)}</b><i></i></button>`).join('')}
+    <button class="wk-nav" data-act="week" data-n="7" aria-label="下一週">${IC.chevR}</button>
+  </div>
+  ${s.items.length?s.items.map((it,i)=>exBlock(it,i,d)).join(''):`
+    <div class="empty"><p class="t-h3">${d===t?'今天還沒有動作':'這天沒有訓練紀錄'}</p><p class="t-callout c2">按下方「新增動作」開始，上次的重量會自動帶出來當參考。</p></div>
+    ${recent.length?`<section class="sec" style="margin-top:0"><div class="sec-h"><h2 class="t-h3">最近做過</h2></div><div class="group">${recent.map(n=>{const l=lastBefore(n,addDays(t,1));
+      return `<button class="row" data-act="pickex" data-name="${esc(n)}"><div class="row-main"><p class="t-body">${esc(n)}</p><p class="t-caption c2">${l?`${md(l.date)}　${esc(setsText(l.sets.slice(0,4),n))}`:esc(catOf(n))}</p></div><span class="c3" style="width:20px;height:20px">${IC.plus}</span></button>`}).join('')}</div></section>`:''}`}`;
+  $('#dateIn').addEventListener('change',e=>{if(e.target.value){ui.date=e.target.value;render()}});
+}
+function exBlock(it,i,d){
+  const n=it.name, lt=loadType(n), as=lt==='assist', last=lastBefore(n,d), pm=maxBefore(n,d), bw=as?bwOn(d):null;
+  const note=(S.meta.exercises[n]?.note||'').replace(/\s*\n\s*/g,'；');
+  const meta=last?`上次 ${md(last.date)}　${setsText(last.sets,n)}`:'第一次做這個動作';
+  return `<section class="exs group" data-i="${i}" aria-label="${esc(n)}">
+    <div class="exs-h"><div class="row-main"><h2 class="t-h2">${esc(n)}</h2></div>
+      <button class="iconbtn" data-act="exmenu" aria-label="${esc(n)} 更多動作">${IC.more}</button></div>
+    <div class="exs-meta"><p class="t-callout c2">${esc(meta)}</p>${note?`<p class="t-caption c3">${esc(note)}</p>`:''}</div>
+    ${as&&bw==null?`<div class="notice" style="margin-top:12px"><span class="t-caption">需要體重紀錄才能算出實際負荷</span><button class="btn btn-plain" data-act="gobody">記錄體重</button></div>`:''}
+    <div class="st-h t-label c3" aria-hidden="true"><span></span><span>${lt==='double'?'重量（單邊）':as?'輔助重量':'重量'}</span><span>次數</span><span>完成</span></div>
+    ${it.sets.map((x,j)=>setRow(it,x,j,d,pm,as)).join('')}
+    <div class="exs-f"><button class="btn btn-plain" data-act="addset">${IC.plus}新增一組</button></div>
+  </section>`;
+}
+function setRow(it,x,j,d,pm,as){
+  const ph=placeholder(it,j,d), ek=effKg(it.name,x,d), pr=isDone(x)&&pm>0&&ek!=null&&ek>pm+1e-6;
+  const phW=ph&&ph.w!=null?fmt((ph.u||'kg')===(x.u||'kg')?ph.w:r1(fromKg(toKg(ph.w,ph.u),x.u||'kg'))):'0';
+  const phR=ph&&ph.r?ph.r:'0';
+  return `<div class="setw" data-j="${j}"><button class="del" data-act="delset" tabindex="-1">刪除</button>
+    <div class="set ${x.done?'done':''}">
+      <span class="idx ${pr?'pr':''}" aria-label="${pr?'個人紀錄':''}">${pr?'PR':j+1}</span>
+      <div class="nf"><input inputmode="decimal" enterkeyhint="next" data-f="w" value="${x.w??''}" placeholder="${phW}" aria-label="第 ${j+1} 組重量"><button class="unit ${x.u==='lb'?'lb':''}" data-act="setunit" aria-label="單位 ${x.u||'kg'}，點一下切換">${x.u||'kg'}</button></div>
+      <div class="nf"><input inputmode="numeric" enterkeyhint="done" data-f="r" value="${x.r??''}" placeholder="${phR}" aria-label="第 ${j+1} 組次數"></div>
+      <button class="chk" data-act="chk" aria-pressed="${!!x.done}" aria-label="第 ${j+1} 組完成"><span>${x.done?IC.check:''}</span></button>
+      ${as?`<div class="eff t-caption c2"><span>實際 <b class="num" data-eff style="color:var(--text);font-weight:600">${effTxt(ek,x)}</b>${x.add?'（額外負重）':''}</span><button data-act="setsign">${x.add?'改為輔助':'改為負重'}</button></div>`:''}
+    </div></div>`;
+}
+function refreshLive(i){
+  const d=ui.date,s=S.sessions[d];
+  const sum=$('#sum');if(sum)sum.textContent=summaryText(d,sessionStats(s));
+  const sec=document.querySelector(`.exs[data-i="${i}"]`);if(!sec)return;
+  const it=s.items[i],pm=maxBefore(it.name,d);
+  sec.querySelectorAll('.setw').forEach((w,j)=>{
+    const x=it.sets[j],ek=effKg(it.name,x,d),pr=isDone(x)&&pm>0&&ek!=null&&ek>pm+1e-6;
+    const idx=w.querySelector('.idx');idx.classList.toggle('pr',pr);idx.textContent=pr?'PR':j+1;
+    const e=w.querySelector('[data-eff]');if(e)e.textContent=effTxt(ek,x);
+  });
+}
+function addExercise(name,cat,unit,load){
+  name=(name||'').trim();if(!name)return;
+  const d=ui.date;
+  S.sessions[d]=S.sessions[d]||{date:d,items:[]};
+  if(S.sessions[d].items.some(i=>i.name===name)){toast('這個動作已經在今天的清單裡');return}
+  if(!S.meta.exercises[name]){S.meta.exercises[name]={cat:cat||'其他',unit:unit||U(),load:load||'single',sides:load==='double'?2:1};saveMeta()}
+  const last=lastBefore(name,d);
+  const sets=last?last.sets.slice(0,10).map(x=>({w:null,r:null,u:x.u||'kg',...(x.add?{add:true}:{})})):[{w:null,r:null,u:exUnit(name)}];
+  S.sessions[d].items.push({name,sets});
+  ui.lastEx=name;saveSession(d);closeSheet();render();
+  const secs=document.querySelectorAll('.exs');secs[secs.length-1]?.scrollIntoView({block:'start',behavior:'smooth'});
+}
+function completeSet(i,j){
+  const d=ui.date,it=S.sessions[d].items[i],x=it.sets[j];
+  if(x.done){x.done=false;saveSession(d);render();return}
+  const ph=placeholder(it,j,d);
+  if(x.w==null&&ph&&ph.w!=null){x.w=ph.w;x.u=ph.u||x.u}
+  if(x.r==null&&ph&&ph.r)x.r=ph.r;
+  if(ph&&ph.add&&x.add==null)x.add=true;
+  if(!x.r){toast('先填次數');document.querySelector(`.exs[data-i="${i}"] .setw[data-j="${j}"] [data-f="r"]`)?.focus();return}
+  x.done=true;haptic(12);ui.lastEx=it.name;saveSession(d);render();
+  if(S.meta.autoRest===true)startRest(restFor(it.name),it.name);
+}
+function removeExercise(i){
+  const d=ui.date,s=S.sessions[d],bak=clone(s.items[i]),name=bak.name;
+  s.items.splice(i,1);
+  let lib=null;
+  if(useCount(name)===0&&S.meta.exercises[name]){lib=S.meta.exercises[name];delete S.meta.exercises[name];saveMeta()}
+  saveSession(d);closeSheet();render();
+  toast(`已移除「${name}」`,{label:'復原',fn:()=>{
+    if(lib){S.meta.exercises[name]=lib;saveMeta()}
+    const ss=S.sessions[d]=S.sessions[d]||{date:d,items:[]};ss.items.splice(Math.min(i,ss.items.length),0,bak);saveSession(d);render();
+  }});
+}
+function deleteSet(i,j){
+  const d=ui.date,it=S.sessions[d].items[i],bak=clone(it.sets[j]);
+  it.sets.splice(j,1);if(!it.sets.length)it.sets.push({w:null,r:null,u:exUnit(it.name)});
+  saveSession(d);render();
+  toast(`已刪除第 ${j+1} 組`,{label:'復原',fn:()=>{const t=S.sessions[d]?.items.find(x=>x.name===it.name);if(!t)return;
+    if(t.sets.length===1&&t.sets[0].w==null&&t.sets[0].r==null&&!t.sets[0].done)t.sets=[];t.sets.splice(Math.min(j,t.sets.length),0,bak);saveSession(d);render()}});
+}
+
+/* add-exercise sheet */
+function openAdd(){
+  ui.newCat=null;ui.newUnit=U();ui.newLoad='single';
+  openSheet('新增動作',`
+    <label class="unitfield" style="padding-left:12px">${'<span style="width:20px;height:20px;color:var(--text-3)">'+IC.search+'</span>'}<input id="q" placeholder="搜尋或輸入新動作" autocomplete="off" enterkeyhint="done" style="font:400 17px/24px var(--font)"></label>
+    <div id="sugg"></div>`,()=>{
+      const q=$('#q');q.addEventListener('input',drawSugg);
+      q.addEventListener('keydown',e=>{if(e.key!=='Enter')return;const v=q.value.trim();if(!v)return;
+        if(S.meta.exercises[v])addExercise(v);else if(ui.newCat)addExercise(v,ui.newCat,ui.newUnit,ui.newLoad);else toast('先選擇部位')});
+      drawSugg();
+    });
+}
+function drawSugg(){
+  const q=($('#q')?.value||'').trim(), used=new Set((S.sessions[ui.date]?.items||[]).map(i=>i.name));
+  const all=allExercises().filter(n=>!used.has(n));
+  const hit=q?all.filter(n=>n.toLowerCase().includes(q.toLowerCase())):all;
+  const exists=q&&(S.meta.exercises[q]||used.has(q));
+  let h='';
+  if(q&&!exists){
+    h+=`<div class="sec" style="margin-top:24px"><div class="sec-h"><h3 class="t-h3">建立「${esc(q)}」</h3></div><div class="group pad">
+      <div class="fl"><span class="t-label">部位</span><div class="choices">${CATS.map(c=>`<button data-act="ncat" data-c="${c}" aria-pressed="${ui.newCat===c}">${c}</button>`).join('')}</div></div>
+      <div class="fl"><span class="t-label">重量計算</span><div class="seg">${LOADS.map(([v,l])=>`<button data-act="nload" data-v="${v}" aria-pressed="${ui.newLoad===v}">${l}</button>`).join('')}</div>
+        <span class="hint t-caption c3">${ui.newLoad==='double'?'輸入單邊或單支啞鈴重量，訓練量自動乘 2。':ui.newLoad==='assist'?'輸入機器輔助重量，實際負荷＝體重－輔助。':'輸入實際使用的重量。'}</span></div>
+      <div class="fl"><span class="t-label">預設單位</span><div class="seg">${['kg','lb'].map(u=>`<button data-act="nunit" data-u="${u}" aria-pressed="${ui.newUnit===u}">${u}</button>`).join('')}</div></div>
+      <button class="btn btn-primary btn-block" style="margin-top:24px" data-act="addnew" ${ui.newCat?'':'disabled'}>${ui.newCat?'加入今天的訓練':'選擇部位後加入'}</button>
+    </div></div>`;
+  }
+  if(hit.length){
+    h+=`<div class="sec" style="margin-top:24px"><div class="sec-h"><h3 class="t-h3">${q?'符合的動作':'動作庫'}</h3><span class="t-caption c3">${hit.length}</span></div>
+    <div class="group">${hit.slice(0,50).map(n=>{const l=lastBefore(n,addDays(todayStr(),1));
+      return `<button class="row" data-act="pickex" data-name="${esc(n)}"><div class="row-main"><p class="t-body">${esc(n)}</p><p class="t-caption c2">${esc(catOf(n))}${l?`　${md(l.date)}　${esc(setsText(l.sets.slice(0,3),n))}`:''}</p></div></button>`}).join('')}</div></div>`;
+  }else if(!q){
+    h+=`<div class="empty"><p class="t-callout c2">輸入第一個動作的名稱，例如「臥推」或「腿推機」。</p></div>`;
+  }
+  $('#sugg').innerHTML=h;
+}
+
+/* exercise edit + library */
+function openExEdit(name){
+  const e=S.meta.exercises[name]||{cat:'其他'};
+  ui.edit={orig:name,cat:e.cat||'其他',unit:e.unit||U(),load:loadType(name)};
+  const c=useCount(name);
+  openSheet('編輯動作',`
+    <div class="group pad">
+      <label class="fl"><span class="t-label">名稱</span><input id="eName" class="field" value="${esc(name)}" autocomplete="off"></label>
+      <div class="fl"><span class="t-label">部位</span><div class="choices">${CATS.map(k=>`<button data-act="ecat" data-c="${k}" aria-pressed="${ui.edit.cat===k}">${k}</button>`).join('')}</div></div>
+      <div class="fl"><span class="t-label">重量計算</span><div class="seg">${LOADS.map(([v,l])=>`<button data-act="eload" data-v="${v}" aria-pressed="${ui.edit.load===v}">${l}</button>`).join('')}</div>
+        <span class="hint t-caption c3">兩邊 ×2 輸入單邊重量；輔助輸入機器輔助重量，實際負荷＝當天體重－輔助。</span></div>
+      <div class="fl"><span class="t-label">預設單位</span><div class="seg">${['kg','lb'].map(u=>`<button data-act="eunit" data-u="${u}" aria-pressed="${ui.edit.unit===u}">${u}</button>`).join('')}</div></div>
+      <label class="fl"><span class="t-label">組間休息</span><select id="eRest" class="field"><option value="">使用預設（${fmtSec(S.meta.rest||90)}）</option>${REST_OPTS.map(s=>`<option value="${s}" ${e.rest===s?'selected':''}>${fmtSec(s)}</option>`).join('')}</select></label>
+      <label class="fl"><span class="t-label">備註</span><textarea id="eNote" class="field" rows="3" placeholder="座椅高度、插銷位置、握法…">${esc(e.note||'')}</textarea></label>
+    </div>
+    <p class="t-caption c3" style="margin:12px 4px 0">共 ${c} 天的紀錄，改名會一併更新。</p>
+    <button class="btn btn-primary btn-block" style="margin-top:24px" data-act="saveex">儲存</button>
+    <button class="btn btn-destructive btn-block" style="margin-top:8px" data-act="delexdb">刪除這個動作</button>`);
+}
+function saveExEdit(){
+  const orig=ui.edit.orig, nn=$('#eName').value.trim();
+  if(!nn){toast('名稱不能空白');return}
+  if(nn!==orig&&S.meta.exercises[nn]){toast('已經有同名的動作');return}
+  const old=S.meta.exercises[orig]||{}, entry={...old,cat:ui.edit.cat,unit:ui.edit.unit,load:ui.edit.load,sides:ui.edit.load==='double'?2:1};
+  const rest=num($('#eRest').value), note=$('#eNote').value.trim();
+  if(rest)entry.rest=rest;else delete entry.rest;
+  if(note)entry.note=note;else delete entry.note;
+  if(nn!==orig){
+    delete S.meta.exercises[orig];
+    Object.keys(S.sessions).forEach(d=>{let ch=false;S.sessions[d].items.forEach(i=>{if(i.name===orig){i.name=nn;ch=true}});if(ch)saveSession(d)});
+    if(ui.prog===orig)ui.prog=nn;if(ui.lastEx===orig)ui.lastEx=nn;
+  }
+  S.meta.exercises[nn]=entry;saveMeta();closeSheet();render();
+}
+async function delExDb(){
+  const n=ui.edit.orig, ds=Object.keys(S.sessions).filter(d=>S.sessions[d].items.some(i=>i.name===n));
+  if(!await askConfirm(ds.length?`刪除「${n}」會一併刪除它 ${ds.length} 天的紀錄，無法復原。`:`從動作庫刪除「${n}」？`))return;
+  ds.forEach(d=>{S.sessions[d].items=S.sessions[d].items.filter(i=>i.name!==n);saveSession(d)});
+  delete S.meta.exercises[n];if(ui.prog===n)ui.prog=null;
+  saveMeta();closeSheet();render();toast(`已刪除「${n}」`);
+}
+function openLib(){
+  const names=allExercises();
+  openSheet('動作庫',names.length?`<p class="t-callout c2" style="margin:0 4px 12px">建立過的動作都在這裡，下次新增時可以直接選。</p><div class="group">${names.map(n=>{const c=useCount(n);
+    return `<button class="row" data-act="editex" data-name="${esc(n)}"><div class="row-main"><p class="t-body">${esc(n)}</p><p class="t-caption c2">${esc(catOf(n))}　${LOADS.find(l=>l[0]===loadType(n))[1]}　${c} 天</p></div><span class="chev">${IC.chevR}</span></button>`}).join('')}</div>`
+  :`<div class="empty"><p class="t-callout c2">還沒有動作。在訓練頁按「新增動作」建立。</p></div>`);
+}
+
+/* =========================================================
+   DOCK + REST TIMER
+   ========================================================= */
+const RT={on:false,done:false,end:0,dur:0,iv:null,ac:null,doneT:null,label:''};
+function dockHTML(){
+  if(RT.on)return `<div class="dock-in timer ${RT.done?'done':''}" role="timer" aria-label="組間休息"><div class="timer-bar" id="rtBar"></div>
+    <div class="timer-main"><b id="rtTime">0:00</b><span class="t-caption c2" id="rtLbl"></span></div>
+    <button class="btn btn-secondary" data-act="rt" data-n="-15" aria-label="減少 15 秒">−15</button>
+    <button class="btn btn-secondary" data-act="rt" data-n="15" aria-label="增加 15 秒">+15</button>
+    <button class="btn btn-secondary" data-act="rtstop">${RT.done?'關閉':'結束'}</button></div>`;
+  if(ui.tab!=='train')return '';
+  return `<div class="dock-in"><button class="btn btn-secondary" data-act="reststart" aria-label="開始組間休息">${IC.timer}${fmtSec(restFor(ui.lastEx))}</button>
+    <button class="btn btn-primary grow" data-act="openadd">${IC.plus}新增動作</button></div>`;
+}
+function updateDock(){
+  const el=$('#dock'),h=dockHTML();el.innerHTML=h;el.hidden=!h;document.body.classList.toggle('has-dock',!!h);
+  if(RT.on)tickRest(true);
+}
+function beep(){
+  const ac=RT.ac;if(!ac)return;
+  try{[0,.28,.56].forEach(t=>{const o=ac.createOscillator(),g=ac.createGain(),s=ac.currentTime+t;
+    o.frequency.value=t>.5?1175:880;o.connect(g);g.connect(ac.destination);
+    g.gain.setValueAtTime(.0001,s);g.gain.exponentialRampToValueAtTime(.3,s+.02);g.gain.exponentialRampToValueAtTime(.0001,s+.2);o.start(s);o.stop(s+.22)})}catch{}
+}
+function startRest(sec,label){
+  try{RT.ac=RT.ac||new (window.AudioContext||window.webkitAudioContext)();RT.ac.resume()}catch{}
+  Object.assign(RT,{on:true,done:false,dur:sec,end:Date.now()+sec*1000,label:label||''});
+  clearTimeout(RT.doneT);clearInterval(RT.iv);RT.iv=setInterval(tickRest,250);updateDock();
+}
+function tickRest(silent){
+  const t=$('#rtTime');if(!t)return;
+  if(RT.done){t.textContent='0:00';$('#rtLbl').textContent='休息結束';$('#rtBar').style.width='0';return}
+  const left=Math.max(0,RT.end-Date.now()),s=Math.ceil(left/1000);
+  t.textContent=`${Math.floor(s/60)}:${pad(s%60)}`;
+  $('#rtLbl').textContent=RT.label||'組間休息';
+  $('#rtBar').style.width=`${RT.dur?left/(RT.dur*1000)*100:0}%`;
+  if(left<=0&&!silent){
+    clearInterval(RT.iv);RT.iv=null;RT.done=true;updateDock();
+    haptic([250,120,250]);beep();RT.doneT=setTimeout(stopRest,8000);
+  }
+}
+function adjRest(d){if(RT.done)return;RT.end=Math.max(Date.now()+1000,RT.end+d*1000);RT.dur=Math.max(RT.dur+d,(RT.end-Date.now())/1000);tickRest(true)}
+function stopRest(){clearInterval(RT.iv);RT.iv=null;clearTimeout(RT.doneT);RT.on=false;RT.done=false;updateDock()}
+
+/* =========================================================
+   CHARTS
+   ========================================================= */
+function baseOpts(){
+  const t3=cssv('text-3'),div=cssv('divider'),font={family:cssv('font')||'system-ui',size:13};
+  return {responsive:true,maintainAspectRatio:false,animation:false,interaction:{mode:'index',intersect:false},
+    plugins:{legend:{display:false},tooltip:{backgroundColor:cssv('text'),titleColor:cssv('bg'),bodyColor:cssv('bg'),padding:10,cornerRadius:10,displayColors:false,titleFont:{...font,weight:'600'},bodyFont:font}},
+    scales:{x:{ticks:{color:t3,maxRotation:0,autoSkipPadding:16,font},grid:{display:false},border:{display:false}},
+            y:{ticks:{color:t3,maxTicksLimit:4,font},grid:{color:div,drawTicks:false},border:{display:false}}}};
+}
+function mk(id,cfg){const el=document.getElementById(id);if(el&&window.Chart)charts[id]=new Chart(el,cfg)}
+const line=(label,data,color,more={})=>Object.assign({label,data,borderColor:color,backgroundColor:color,borderWidth:2,tension:.3,spanGaps:true,pointRadius:0,pointHoverRadius:4,pointHitRadius:14},more);
+const lastPoint=n=>({pointRadius:c=>c.dataIndex===n-1?3.5:0});
+const rangeSeg=()=>`<div class="seg" role="group" aria-label="時間範圍">${[[30,'1 月'],[90,'3 月'],[180,'半年'],[365,'1 年'],[0,'全部']].map(([n,l])=>`<button data-act="range" data-n="${n}" aria-pressed="${ui.range===n}">${l}</button>`).join('')}</div>`;
+
+/* =========================================================
+   SCREEN: 進度
+   ========================================================= */
+function renderProg(){
+  if(ui.prog&&allExercises().includes(ui.prog))return renderProgDetail();
+  ui.prog=null;
+  const dates=sessionDates().filter(inRange), names=allExercises().filter(n=>exHistory(n).length);
+  if(!sessionDates().length){app.innerHTML=`${header('進度')}<div class="empty"><p class="t-h3">還沒有完成的訓練</p><p class="t-callout c2">完成第一組後，這裡會開始累積每個動作的進度。</p></div>`;return}
+  const weeks={};
+  dates.forEach(d=>{const k=weekKey(d);weeks[k]=weeks[k]||{n:0,cat:{}};weeks[k].n++;
+    S.sessions[d].items.forEach(it=>{const c=catOf(it.name);weeks[k].cat[c]=(weeks[k].cat[c]||0)+itemVol(it,d)})});
+  const wk=Object.keys(weeks).sort(), total=wk.reduce((a,k)=>a+Object.values(weeks[k].cat).reduce((x,y)=>x+y,0),0);
+  const used=CATS.filter(c=>wk.some(k=>weeks[k].cat[c]));
+  app.innerHTML=`${header('進度')}
+  ${backupNotice()}
+  ${rangeSeg()}
+  <section class="sec" style="margin-top:24px"><div class="sec-h"><h2 class="t-h3">每週訓練量</h2><span class="t-caption c2">${U()}</span></div>
+    <div class="group pad">${dates.length?`<p class="t-callout c2">${dates.length} 次訓練　平均每週 ${fmt(dates.length/Math.max(1,wk.length))} 次　共 ${volTxt(total)}</p>
+      <div class="cw" style="margin-top:16px"><canvas id="cWk" aria-label="每週訓練量長條圖"></canvas></div>
+      <p class="t-caption c2" style="margin-top:12px;display:flex;flex-wrap:wrap;gap:4px 16px">${used.map(c=>`<span style="display:inline-flex;align-items:center;gap:6px"><i style="width:8px;height:8px;border-radius:2px;background:${catColor(c)}"></i>${c}</span>`).join('')}</p>`
+      :`<p class="t-callout c2">這段期間沒有訓練。</p>`}</div></section>
+  <section class="sec"><div class="sec-h"><h2 class="t-h3">動作</h2><span class="t-caption c2">最近一次的最重組</span></div>
+    <div class="group">${names.map(n=>{const h=exHistory(n),l=h[h.length-1],p=h[h.length-2],dv=p?l.top-p.top:0;
+      return `<button class="row" data-act="progex" data-name="${esc(n)}"><div class="row-main"><p class="t-body">${esc(n)}</p><p class="t-caption c2">${esc(catOf(n))}　${md(l.date)}　${h.length} 次</p></div>
+        <div class="row-end"><p class="t-callout num">${showW(l.top)} ${U()}</p>${p&&Math.abs(dv)>.01?`<p class="t-caption num ${dv>0?'good':'c3'}">${dv>0?'+':'−'}${showW(Math.abs(dv))}</p>`:''}</div><span class="chev">${IC.chevR}</span></button>`}).join('')}</div></section>
+  <section class="sec"><div class="sec-h"><h2 class="t-h3">訓練紀錄</h2></div>
+    <div class="group">${(dates.length?dates:sessionDates()).slice().reverse().slice(0,30).map(d=>{const s=S.sessions[d],st=sessionStats(s);
+      return `<button class="row" data-act="openday" data-d="${d}"><div class="row-main"><p class="t-body">${mdLong(d)} 週${wd(d)}</p><p class="t-caption c2">${esc(s.items.filter(i=>i.sets.some(isDone)).map(i=>i.name).join('、'))}</p></div><p class="row-end t-callout c2 num">${volTxt(st.vol)}</p><span class="chev">${IC.chevR}</span></button>`}).join('')}</div></section>`;
+  if(dates.length){
+    const o=baseOpts();o.scales.x.stacked=true;o.scales.y.stacked=true;o.plugins.tooltip.displayColors=true;o.plugins.tooltip.boxPadding=4;
+    mk('cWk',{type:'bar',data:{labels:wk.map(md),datasets:used.map(c=>({label:c,data:wk.map(k=>Math.round(fromKg(weeks[k].cat[c]||0,U()))),backgroundColor:catColor(c),borderRadius:2,maxBarThickness:22,borderColor:cssv('surface'),borderWidth:{top:1}}))},options:o});
+  }
+}
+function renderProgDetail(){
+  const n=ui.prog, all=exHistory(n), h=all.filter(x=>inRange(x.date)), lt=loadType(n);
+  const best=f=>all.reduce((a,b)=>f(b)>f(a)?b:a,all[0]);
+  const a=all.length?best(x=>x.top):null,b=all.length?best(x=>x.e1rm):null,c=all.length?best(x=>x.vol):null;
+  app.innerHTML=`<header class="ph"><div class="ph-row"><button class="btn btn-plain back" data-act="progback">${IC.chevL}進度</button><div class="ph-act"><button class="btn btn-plain" data-act="editex" data-name="${esc(n)}">編輯</button></div></div>
+    <h1 class="t-h1" style="margin-top:4px">${esc(n)}</h1><p class="ph-sub t-callout c2">${esc(catOf(n))}　${LOADS.find(l=>l[0]===lt)[1]}${lt==='assist'?'　數字為實際負荷':lt==='double'?'　數字為單邊重量':''}</p></header>
+  ${all.length?`<div class="group stats">
+    <div><p class="t-label c2">最重一組</p><p class="t-h2 num">${showW(a.top)}<span class="t-callout c2"> ${U()}×${a.topReps}</span></p><p class="t-caption c3">${md(a.date)}</p></div>
+    <div><p class="t-label c2">估算 1RM</p><p class="t-h2 num">${showW(b.e1rm)}<span class="t-callout c2"> ${U()}</span></p><p class="t-caption c3">${md(b.date)}</p></div>
+    <div><p class="t-label c2">單次總量</p><p class="t-h2 num">${showW(c.vol,0)}<span class="t-callout c2"> ${U()}</span></p><p class="t-caption c3">${md(c.date)}</p></div></div>`
+  :`<div class="empty"><p class="t-callout c2">還沒有完成的組。</p></div>`}
+  ${all.length?`<div style="margin-top:24px">${rangeSeg()}</div>`:''}
+  ${h.length===1?`<p class="t-callout c2" style="margin:16px 4px 0">再記錄一次這個動作，就會出現進步曲線。</p>`:''}
+  ${h.length?`${h.length>1?`<section class="sec" style="margin-top:24px"><div class="sec-h"><h2 class="t-h3">重量</h2><span class="t-caption c2">實線為最重一組，虛線為估算 1RM</span></div>
+    <div class="group pad"><div class="cw"><canvas id="cE" aria-label="重量趨勢"></canvas></div></div></section>
+  <section class="sec"><div class="sec-h"><h2 class="t-h3">訓練量</h2><span class="t-caption c2">重量 × 次數，${U()}</span></div>
+    <div class="group pad"><div class="cw" style="height:160px"><canvas id="cV" aria-label="訓練量"></canvas></div></div></section>`:''}
+  <section class="sec"${h.length>1?'':' style="margin-top:24px"'}><div class="sec-h"><h2 class="t-h3">每次紀錄</h2></div><div class="group">${h.slice().reverse().map(x=>
+    `<button class="row" data-act="openday" data-d="${x.date}"><div class="row-main"><p class="t-body">${mdLong(x.date)} 週${wd(x.date)}</p><p class="t-caption c2">${esc(setsText(x.sets,n))}</p></div><p class="row-end t-callout num">${showW(x.top)} ${U()}</p></button>`).join('')}</div></section>`
+  :all.length?`<div class="empty"><p class="t-callout c2">這段期間沒有做這個動作。</p></div>`:''}`;
+  if(h.length<2)return;
+  const L=h.map(x=>md(x.date)),p=cssv('primary');
+  mk('cE',{type:'line',data:{labels:L,datasets:[line('最重一組',h.map(x=>r1(fromKg(x.top,U()))),p,lastPoint(h.length)),line('估算 1RM',h.map(x=>r1(fromKg(x.e1rm,U()))),cssv('text-3'),{borderDash:[4,4],borderWidth:1.5})]},options:baseOpts()});
+  mk('cV',{type:'bar',data:{labels:L,datasets:[{label:'訓練量',data:h.map(x=>Math.round(fromKg(x.vol,U()))),backgroundColor:p,borderRadius:3,maxBarThickness:18}]},options:baseOpts()});
+}
+
+/* =========================================================
+   SCREEN: 身體
+   ========================================================= */
+function deltaVs(sr,days){
+  if(sr.length<2)return null;const cur=sr[sr.length-1],target=addDays(cur.d,-days);
+  let ref=sr[0];for(const p of sr){if(p.d<=target)ref=p;else break}
+  return ref.d===cur.d?null:{ref,dv:cur.v-ref.v};
+}
+function renderBody(){
+  const ws=seriesOf('weight'), cur=ws[ws.length-1], keys=Object.keys(S.body).sort().reverse();
+  const inR=ws.filter(p=>inRange(p.d));
+  const dl=cur?deltaVs(ws,30):null;
+  const comp=['fatPct','muscle','fatMass','visceral','bmr'].map(k=>({k,sr:seriesOf(k)})).filter(x=>x.sr.length);
+  const goodDir={fatPct:-1,fatMass:-1,visceral:-1,muscle:1};
+  const bmi=cur&&S.meta.height?cur.v/((S.meta.height/100)**2):null;
+  const compSeries=Object.keys(S.body).sort().filter(inRange).filter(d=>S.body[d].fatPct!=null||S.body[d].muscle!=null);
+  app.innerHTML=`${header('身體')}
+  ${backupNotice()}
+  <div class="group pad">
+    ${cur?`<p class="t-label c2">體重</p>
+      <div class="metric-v"><span class="t-display num">${fmt(bShow('weight',cur.v))}</span><span class="t-h3 c2">${U()}</span></div>
+      <p class="t-callout c2 num">${dl?`較 ${md(dl.ref.d)} ${dl.dv>0?'+':dl.dv<0?'−':'±'}${fmt(Math.abs(bShow('weight',dl.dv)))} ${U()}　`:''}${md(cur.d)} 量測${bmi?`　BMI ${fmt(bmi)}`:''}</p>
+      ${ws.length>1?`<div style="margin-top:20px">${rangeSeg()}</div>${inR.length>1?`<div class="cw" style="height:160px;margin-top:16px"><canvas id="cW" aria-label="體重趨勢"></canvas></div>`:`<p class="t-callout c2" style="margin-top:16px">這段期間只有一筆紀錄。</p>`}`:''}`
+    :`<p class="t-h3">還沒有體重紀錄</p><p class="t-callout c2" style="margin-top:4px">記下今天的體重，趨勢圖就會開始累積。</p>`}
+    <div class="btn-row" style="margin-top:20px"><button class="btn btn-primary" data-act="weigh">記錄體重</button><button class="btn btn-secondary" data-act="inbody" data-d="${todayStr()}">InBody 量測</button></div>
+  </div>
+  ${comp.length?`<section class="sec"><div class="sec-h"><h2 class="t-h3">身體組成</h2></div><div class="group">${comp.map(({k,sr})=>{
+      const c=sr[sr.length-1],p=sr[sr.length-2],dv=p?bShow(k,c.v)-bShow(k,p.v):null,g=goodDir[k];
+      const cls=dv==null||Math.abs(dv)<.05||!g?'c2':(Math.sign(dv)===g?'good':'bad');
+      return `<div class="row"><div class="row-main"><p class="t-body">${bLabel(k)}</p><p class="t-caption c2">${md(c.d)}${p?`　較 ${md(p.d)} <span class="${cls}">${dv>0?'+':dv<0?'−':'±'}${fmt(Math.abs(dv),k==='bmr'?0:1)}</span>`:''}</p></div><p class="row-end t-body num">${fmt(bShow(k,c.v),k==='bmr'?0:1)} <span class="t-callout c2">${bUnit(k)}</span></p></div>`}).join('')}</div>
+    ${compSeries.length>1?`<div class="group pad" style="margin-top:12px"><p class="t-caption c2" style="display:flex;gap:16px"><span><i style="display:inline-block;width:12px;height:2px;background:var(--primary);vertical-align:middle;margin-right:6px"></i>骨骼肌 ${U()}</span><span><i style="display:inline-block;width:12px;height:0;border-top:2px dashed var(--warning);vertical-align:middle;margin-right:6px"></i>體脂率 %</span></p><div class="cw" style="height:180px;margin-top:12px"><canvas id="cC" aria-label="身體組成趨勢"></canvas></div></div>`:''}
+  </section>`:''}
+  ${keys.length?`<section class="sec"><div class="sec-h"><h2 class="t-h3">量測紀錄</h2></div><div class="group">${keys.slice(0,40).map(k=>{const r=S.body[k];
+    const bits=[r.fatPct!=null?`體脂 ${fmt(r.fatPct)}%`:'',r.muscle!=null?`骨骼肌 ${fmt(bShow('muscle',r.muscle))} ${U()}`:''].filter(Boolean).join('　');
+    return `<button class="row" data-act="inbody" data-d="${k}"><div class="row-main"><p class="t-body">${mdLong(k)} 週${wd(k)}</p>${bits?`<p class="t-caption c2">${bits}</p>`:''}</div><p class="row-end t-callout num">${r.weight!=null?`${fmt(bShow('weight',r.weight))} ${U()}`:''}</p><span class="chev">${IC.chevR}</span></button>`}).join('')}</div></section>`:''}`;
+  if(inR.length>1)mk('cW',{type:'line',data:{labels:inR.map(p=>md(p.d)),datasets:[line('體重',inR.map(p=>r1(bShow('weight',p.v))),cssv('primary'),lastPoint(inR.length))]},options:baseOpts()});
+  if(compSeries.length>1){
+    const o=baseOpts();o.scales.y2={position:'right',ticks:{color:cssv('text-3'),maxTicksLimit:4,font:{family:cssv('font'),size:13}},grid:{display:false},border:{display:false}};
+    mk('cC',{type:'line',data:{labels:compSeries.map(md),datasets:[
+      line('骨骼肌',compSeries.map(d=>r1(bShow('muscle',S.body[d].muscle))),cssv('primary'),{pointRadius:2.5}),
+      line('體脂率',compSeries.map(d=>S.body[d].fatPct??null),cssv('warning'),{yAxisID:'y2',borderDash:[4,4],pointRadius:2.5})]},options:o});
+  }
+}
+function openWeight(){
+  const d=todayStr(),rec=S.body[d]||{},prev=seriesOf('weight').filter(p=>p.d<d).pop();
+  openSheet('記錄體重',`<div class="group pad">
+    <label class="fl"><span class="t-label">日期</span><input type="date" id="wDate" class="field" value="${d}"></label>
+    <label class="fl"><span class="t-label">體重</span><span class="unitfield"><input id="wVal" inputmode="decimal" enterkeyhint="done" value="${rec.weight!=null?r1(bShow('weight',rec.weight)):''}" placeholder="${prev?r1(bShow('weight',prev.v)):'0'}"><span>${U()}</span></span>
+      ${prev?`<span class="hint t-caption c3">上次 ${md(prev.d)}：${fmt(bShow('weight',prev.v))} ${U()}</span>`:''}</label></div>
+    <button class="btn btn-primary btn-block" style="margin-top:24px" data-act="saveweight">儲存</button>`,
+    ()=>{const v=$('#wVal');setTimeout(()=>v.focus(),320);v.addEventListener('keydown',e=>{if(e.key==='Enter')saveWeight()})});
+}
+function saveWeight(){
+  const d=$('#wDate').value,v=num($('#wVal').value);
+  if(!d){toast('請選擇日期');return}if(v==null){toast('請輸入體重');return}
+  S.body[d]={...(S.body[d]||{}),date:d,weight:toKg(v,U())};saveBodyRec(d);closeSheet();render();
+}
+function openInbody(d){
+  const rec=S.body[d]||{},prevKey=Object.keys(S.body).filter(k=>k<d).sort().pop(),pv=prevKey?S.body[prevKey]:{};
+  const val=k=>rec[k]!=null?r1(bShow(k,rec[k])):'';
+  openSheet(S.body[d]?'量測紀錄':'InBody 量測',`<div class="group pad">
+    <label class="fl"><span class="t-label">日期</span><input type="date" id="bDate" class="field" value="${d}"></label>
+    <div class="fgrid" style="margin-top:20px">${BODY_FIELDS.map(([k,l])=>`<label class="fl"><span class="t-label">${l}</span>
+      <span class="unitfield"><input id="f-${k}" inputmode="decimal" value="${val(k)}" placeholder="${pv[k]!=null?r1(bShow(k,pv[k])):''}"><span>${bUnit(k)}</span></span></label>`).join('')}</div>
+    <p class="t-caption c3" style="margin-top:12px">只填有量的欄位。灰色數字是上一次的紀錄。</p></div>
+    <button class="btn btn-primary btn-block" style="margin-top:24px" data-act="savebody" data-orig="${S.body[d]?d:''}">儲存</button>
+    ${S.body[d]?`<button class="btn btn-destructive btn-block" style="margin-top:8px" data-act="delbody" data-d="${d}">刪除這筆紀錄</button>`:''}`);
+}
+function saveInbody(orig){
+  const d=$('#bDate').value;if(!d){toast('請選擇日期');return}
+  const rec={date:d};let any=false;
+  BODY_FIELDS.forEach(([k])=>{const v=num($('#f-'+k).value);if(v!=null){rec[k]=isMass(k)?toKg(v,U()):v;any=true}});
+  if(!any){toast('至少填一個數字');return}
+  if(orig&&orig!==d){delete S.body[orig];saveBodyRec(orig)}
+  S.body[d]=rec;saveBodyRec(d);closeSheet();render();
+}
+
+/* =========================================================
+   SETTINGS + BACKUP
+   ========================================================= */
+const BACKUP_DAYS=14, SNOOZE_K='gymlog-backup-snooze';
+const daysSince=t=>Math.floor((Date.now()-new Date(t).getTime())/864e5);
+/* last time the data was safe in a file; never backed up = since the first record */
+function backupBase(){
+  if(S.meta.lastBackup)return S.meta.lastBackup;
+  const ds=[...Object.keys(S.sessions),...Object.keys(S.body)].sort();
+  return ds.length?ds[0]+'T00:00:00':null;
+}
+const backupDue=()=>{const b=backupBase();return !!b&&daysSince(b)>BACKUP_DAYS};
+function backupText(){
+  const b=S.meta.lastBackup;if(!b)return '還沒有備份過';
+  const n=daysSince(b);return `上次備份 ${mdLong(ymd(new Date(b)))}（${n<1?'今天':`${n} 天前`}）`;
+}
+/* shown on 進度 / 身體 only, so it never interrupts a workout; "稍後" hides it for 3 days */
+function backupNotice(){
+  if(!backupDue())return '';
+  try{const s=localStorage.getItem(SNOOZE_K);if(s&&todayStr()<s)return ''}catch{}
+  const msg=S.meta.lastBackup?`已經 ${daysSince(S.meta.lastBackup)} 天沒有備份`:'還沒有備份過資料';
+  return `<div class="group" style="margin-bottom:16px"><div class="notice"><span class="t-callout">${msg}</span>
+    <span style="display:flex;align-items:center;flex:none"><button class="btn btn-plain" data-act="export">匯出</button><button class="btn btn-plain" data-act="snoozebackup" style="color:var(--text-2)">稍後</button></span></div></div>`;
+}
+function openSettings(){
+  openSheet('設定',`
+    <div class="group">
+      <div class="row"><span class="row-main t-body">顯示單位</span><div class="seg" style="width:120px">${['kg','lb'].map(u=>`<button data-act="unit" data-u="${u}" aria-pressed="${U()===u}">${u}</button>`).join('')}</div></div>
+      <label class="row"><span class="row-main t-body">身高</span><span class="unitfield" style="width:120px"><input id="hIn" inputmode="decimal" value="${S.meta.height??''}" placeholder="—" style="text-align:right;font-size:17px"><span>cm</span></span></label>
+      <label class="row"><span class="row-main t-body">預設組間休息</span><select id="restDef" class="field" style="width:120px;min-height:40px">${REST_OPTS.map(s=>`<option value="${s}" ${(S.meta.rest||90)===s?'selected':''}>${fmtSec(s)}</option>`).join('')}</select></label>
+      <label class="row"><span class="row-main"><span class="t-body" style="display:block">完成一組後自動計時</span><span class="t-caption c2">關閉時從下方工具列手動開始</span></span><span class="toggle"><input type="checkbox" id="autoRest" ${S.meta.autoRest===true?'checked':''}><span></span></span></label>
+    </div>
+    <div class="group" style="margin-top:24px">
+      <button class="row" data-act="openlib"><span class="row-main t-body">動作庫</span><span class="row-end t-callout c2">${Object.keys(S.meta.exercises).length}</span><span class="chev">${IC.chevR}</span></button>
+    </div>
+    <div class="group" style="margin-top:24px">
+      <button class="row" data-act="export"><span class="row-main t-body" style="color:var(--primary)">匯出備份</span></button>
+      <label class="row" style="cursor:pointer"><span class="row-main t-body" style="color:var(--primary)">匯入備份</span><input type="file" id="imp" accept=".json,application/json" class="vh"></label>
+    </div>
+    <p class="t-caption ${backupDue()?'':'c2'}" style="margin:12px 4px 0;${backupDue()?'color:var(--warning)':''}" id="bkInfo">${backupText()}</p>
+    <p class="t-caption c3" style="margin:4px 4px 0">資料只存在這台裝置，刪除 App 會一併刪除，建議定期匯出備份到「檔案」。重量以公斤保存，切換單位不會失真。</p>`,
+  ()=>{
+    $('#hIn').addEventListener('change',e=>{S.meta.height=num(e.target.value);saveMeta();render()});
+    $('#restDef').addEventListener('change',e=>{S.meta.rest=+e.target.value;saveMeta();updateDock()});
+    $('#autoRest').addEventListener('change',e=>{S.meta.autoRest=e.target.checked;saveMeta()});
+    $('#imp').addEventListener('change',importFile);
+  });
+}
+async function exportData(){
+  const text=JSON.stringify({app:'gymlog',version:4,exported:new Date().toISOString(),...S},null,1);
+  const filename=`酷酷擼鐵備份-${todayStr()}.json`;
+  const file=new File([text],filename,{type:'application/json'});
+  /* iOS: share sheet → 儲存到「檔案」; elsewhere fall back to a plain download */
+  if(navigator.canShare&&navigator.canShare({files:[file]})){
+    try{await navigator.share({files:[file]})}
+    catch(e){if(e.name!=='AbortError'){toast('沒有匯出備份');console.warn(e)}return}
+  }else{
+    const a=document.createElement('a'),url=URL.createObjectURL(file);
+    a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  }
+  S.meta.lastBackup=new Date().toISOString();saveMeta();render();
+  const info=$('#bkInfo');if(info){info.className='t-caption c2';info.style.color='';info.textContent=backupText()}
+  toast('已匯出備份');
+}
+function importFile(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=async()=>{
+    let d;try{d=JSON.parse(r.result);if(d.app!=='gymlog')throw 0}catch{toast('這不是酷酷擼鐵匯出的備份檔');return}
+    if(!await askConfirm('匯入會合併備份裡的紀錄，同一天的資料以備份為準。','匯入'))return;
+    try{
+      Object.assign(S.meta.exercises,d.meta?.exercises||{});if(d.meta?.height)S.meta.height=d.meta.height;
+      /* the imported file is itself a backup, so it counts toward 上次備份 */
+      if(d.exported&&!(S.meta.lastBackup>=d.exported))S.meta.lastBackup=d.exported;
+      await store.saveMeta(S.meta);
+      for(const [k,v] of Object.entries(d.sessions||{})){S.sessions[k]=v;await store.saveSession(k,v)}
+      for(const [k,v] of Object.entries(d.body||{})){S.body[k]=v;await store.saveBody(k,v)}
+      migrate();closeSheet();render();toast('匯入完成');
+    }catch(err){toast('匯入失敗，請再試一次')}
+  };
+  r.readAsText(f);
+}
+
+/* =========================================================
+   INTERACTION
+   ========================================================= */
+$('#tabs').addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(!b)return;
+  if(ui.tab===b.dataset.tab&&b.dataset.tab==='prog')ui.prog=null;ui.tab=b.dataset.tab;render();window.scrollTo(0,0)});
+
+function closeSwipes(except){document.querySelectorAll('.set.open').forEach(s=>{if(s!==except)s.classList.remove('open')})}
+document.body.addEventListener('click',e=>{
+  const b=e.target.closest('[data-act]');
+  if(!b||!b.closest('.setw')||b.dataset.act!=='delset')closeSwipes();
+  if(!b||b.disabled)return;
+  const act=b.dataset.act, d=ui.date, sec=b.closest('.exs');
+  const i=sec?+sec.dataset.i:(b.dataset.i!=null?+b.dataset.i:null);
+  const row=b.closest('.setw'), j=row?+row.dataset.j:null;
+  const s=S.sessions[d];
+  switch(act){
+    case 'close': closeSheet();break;
+    case 'settings': openSettings();break;
+    case 'today': ui.date=todayStr();render();break;
+    case 'week': ui.date=addDays(d,+b.dataset.n);render();break;
+    case 'pick': ui.date=b.dataset.d;render();break;
+    case 'openday': ui.tab='train';ui.date=b.dataset.d;render();window.scrollTo(0,0);break;
+    case 'openadd': openAdd();break;
+    case 'pickex': addExercise(b.dataset.name);break;
+    case 'ncat': ui.newCat=b.dataset.c;drawSugg();break;
+    case 'nload': ui.newLoad=b.dataset.v;drawSugg();break;
+    case 'nunit': ui.newUnit=b.dataset.u;drawSugg();break;
+    case 'addnew': addExercise($('#q').value,ui.newCat,ui.newUnit,ui.newLoad);break;
+    case 'exmenu':{const it=s.items[i];actionSheet(it.name,[
+      {label:'編輯動作',act:'editex',data:{name:it.name}},
+      ...(exHistory(it.name).length?[{label:'查看進度',act:'progex',data:{name:it.name}}]:[]),
+      ...(it.sets.length>1?[{label:'刪除最後一組',act:'dellast',data:{i}}]:[]),
+      {label:'從今天移除',act:'rmex',data:{i},danger:true}]);break}
+    case 'editex': openExEdit(b.dataset.name);break;
+    case 'progex': closeSheet();ui.tab='prog';ui.prog=b.dataset.name;render();window.scrollTo(0,0);break;
+    case 'progback': ui.prog=null;render();window.scrollTo(0,0);break;
+    case 'rmex': removeExercise(i);break;
+    case 'dellast': closeSheet();deleteSet(i,s.items[i].sets.length-1);break;
+    case 'addset':{const it=s.items[i],last=it.sets[it.sets.length-1]||{};
+      it.sets.push({w:null,r:null,u:last.u||exUnit(it.name),...(last.add?{add:true}:{})});saveSession(d);render();break}
+    case 'delset': deleteSet(i,j);break;
+    case 'chk': completeSet(i,j);break;
+    case 'setunit':{const x=s.items[i].sets[j];x.u=(x.u||'kg')==='lb'?'kg':'lb';saveSession(d);
+      b.textContent=x.u;b.classList.toggle('lb',x.u==='lb');b.setAttribute('aria-label',`單位 ${x.u}，點一下切換`);refreshLive(i);break}
+    case 'setsign':{const x=s.items[i].sets[j];x.add=!x.add;if(!x.add)delete x.add;saveSession(d);render();break}
+    case 'gobody': ui.tab='body';render();window.scrollTo(0,0);openWeight();break;
+    case 'reststart': startRest(restFor(ui.lastEx),ui.lastEx);break;
+    case 'rt': adjRest(+b.dataset.n);break;
+    case 'rtstop': stopRest();break;
+    case 'ecat': ui.edit.cat=b.dataset.c;b.parentElement.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));break;
+    case 'eload': ui.edit.load=b.dataset.v;b.parentElement.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));break;
+    case 'eunit': ui.edit.unit=b.dataset.u;b.parentElement.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));break;
+    case 'saveex': saveExEdit();break;
+    case 'delexdb': delExDb();break;
+    case 'openlib': openLib();break;
+    case 'unit': if(U()!==b.dataset.u){S.meta.unit=b.dataset.u;saveMeta();b.parentElement.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));render()}break;
+    case 'weigh': openWeight();break;
+    case 'inbody': openInbody(b.dataset.d);break;
+    case 'saveweight': saveWeight();break;
+    case 'savebody': saveInbody(b.dataset.orig);break;
+    case 'delbody':{const k=b.dataset.d;askConfirm(`刪除 ${mdLong(k)} 的量測紀錄？`).then(ok=>{if(!ok)return;delete S.body[k];saveBodyRec(k);closeSheet();render();toast('已刪除')});break}
+    case 'export': exportData();break;
+    case 'snoozebackup': try{localStorage.setItem(SNOOZE_K,addDays(todayStr(),3))}catch{}render();break;
+    case 'range': ui.range=+b.dataset.n;render();break;
+  }
+});
+app.addEventListener('input',e=>{
+  const inp=e.target;if(!inp.dataset.f)return;
+  const i=+inp.closest('.exs').dataset.i, j=+inp.closest('.setw').dataset.j, it=S.sessions[ui.date].items[i], x=it.sets[j];
+  if(inp.dataset.f==='r')x.r=parseInt(inp.value)||null;else{x.w=num(inp.value);x.u=x.u||exUnit(it.name)}
+  ui.lastEx=it.name;saveSession(ui.date);refreshLive(i);
+});
+app.addEventListener('keydown',e=>{
+  if(e.key!=='Enter'||!e.target.dataset.f)return;e.preventDefault();
+  if(e.target.dataset.f==='w')e.target.closest('.set').querySelector('[data-f="r"]').focus();else e.target.blur();
+});
+/* swipe a set row left to reveal delete */
+let sw=null;
+app.addEventListener('touchstart',e=>{const r=e.target.closest('.set');if(!r)return;closeSwipes(r);
+  sw={r,x0:e.touches[0].clientX,y0:e.touches[0].clientY,dx:0,lock:null,base:r.classList.contains('open')?-88:0}},{passive:true});
+app.addEventListener('touchmove',e=>{if(!sw)return;const t=e.touches[0],dx=t.clientX-sw.x0,dy=t.clientY-sw.y0;
+  if(sw.lock==null&&(Math.abs(dx)>8||Math.abs(dy)>8))sw.lock=Math.abs(dx)>Math.abs(dy)?'x':'y';
+  if(sw.lock!=='x')return;e.preventDefault();sw.dx=dx;sw.r.style.transition='none';sw.r.style.transform=`translateX(${Math.min(0,Math.max(-112,sw.base+dx))}px)`},{passive:false});
+app.addEventListener('touchend',()=>{if(!sw)return;const r=sw.r;r.style.transition='';r.style.transform='';
+  if(sw.lock==='x')r.classList.toggle('open',sw.base+sw.dx<-44);sw=null});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){if($('#dlg').classList.contains('open'))return;closeSheet()}});
+matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change',()=>render());
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&RT.on&&!RT.done)tickRest()});
+
+/* =========================================================
+   BOOT
+   ========================================================= */
+function migrate(){
+  const m=S.meta;
+  if((m.v||0)<3)m.autoRest=false;
+  if((m.v||0)<4){
+    /* v4: sets need an explicit done flag; everything recorded before had values = done */
+    Object.entries(S.sessions).forEach(([k,s])=>{let ch=false;(s.items||[]).forEach(it=>it.sets.forEach(x=>{if(x.r&&!x.done){x.done=true;ch=true}}));if(ch)saveSession(k)});
+    m.v=4;saveMeta();
+  }
+  const orphans=Object.keys(m.exercises).filter(n=>useCount(n)===0&&!m.exercises[n].note);
+  if(orphans.length){orphans.forEach(n=>delete m.exercises[n]);saveMeta()}
+}
+/* new version: prompt while the app is open; one that installed while it was closed is applied on the next launch */
+function initSW(){
+  if(!('serviceWorker' in navigator))return;
+  const sw=navigator.serviceWorker, hadCtrl=!!sw.controller;
+  let reloading=false;
+  sw.addEventListener('controllerchange',()=>{if(!hadCtrl||reloading)return;reloading=true;flushSaves().finally(()=>location.reload())});
+  sw.register('sw.js').then(reg=>{
+    if(reg.waiting&&hadCtrl){reg.waiting.postMessage('skipWaiting');return}
+    reg.addEventListener('updatefound',()=>{const w=reg.installing;if(!w)return;
+      w.addEventListener('statechange',()=>{if(w.state==='installed'&&sw.controller)
+        toast('有新版本',{label:'重新載入',fn:()=>w.postMessage('skipWaiting')})})});
+    /* iOS resumes home-screen apps without navigating, so check for updates on resume too */
+    document.addEventListener('visibilitychange',()=>{if(!document.hidden)reg.update().catch(()=>{})});
+  }).catch(e=>console.warn(e));
+}
+document.addEventListener('visibilitychange',()=>{if(document.hidden)flushSaves()});
+(async()=>{
+  await initStore();
+  try{const d=await store.load();if(d)S={meta:Object.assign({height:null,unit:'kg',rest:90,autoRest:false,exercises:{}},d.meta||{}),sessions:d.sessions||{},body:d.body||{}}}
+  catch(e){console.warn(e);app.innerHTML=`<div class="empty"><p class="t-h3">讀取資料失敗</p><p class="t-callout c2">請關閉 App 後重新開啟。</p></div>`;return}
+  migrate();
+  const ls=S.sessions[todayStr()]?.items;if(ls?.length)ui.lastEx=ls[ls.length-1].name;
+  render();
+  try{navigator.storage?.persist?.().catch(()=>{})}catch{}
+  initSW();
+})();
+</script>
+</body>
+</html>
