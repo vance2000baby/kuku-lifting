@@ -1,9 +1,11 @@
-# 酷酷擼鐵 — 專案說明（給 Claude Code）
+# 別肌動 — 專案說明（給 Claude Code）
 
 個人用的手機健身紀錄 App：記錄每組重量與次數、體重與 InBody 數據，並用圖表追蹤長期進度。
 原本以 claude.ai Artifact 發布，現在是可安裝到 iPhone 主畫面的 PWA，部署在 GitHub Pages。
 
 使用者只有一位（App 擁有者本人），主要情境是在健身房組間單手操作，介面語言為繁體中文。
+
+App 名稱是「別肌動」（2026-10-04 由「酷酷擼鐵」改名）。以下內部識別刻意沿用舊名，**不要改**：localStorage key `gymlog-v1`（改了會讀不到既有資料）、匯出格式的 `app: 'gymlog'`（舊備份要能匯入）、快取前綴 `kuku-`、repo 名稱 `kuku-lifting`（改了 Pages 網址會變，已安裝的 App 會失效）。
 
 ## 檔案結構
 
@@ -117,7 +119,7 @@ S = {
 
 狀態（2026-10-01）：1–7 已完成，8 尚未做（目前資料量很小，localStorage 足夠）。9 見下方「部署」。
 
-1. **Manifest**：新增 `manifest.webmanifest`，內容包含 `name`、`short_name`「酷酷擼鐵」、`display: standalone`、`start_url`、`scope`、`theme_color`、`background_color`（`#F6F5F2`），以及 192、512 和 maskable 圖示。
+1. **Manifest**：新增 `manifest.webmanifest`，內容包含 `name`、`short_name`「別肌動」、`display: standalone`、`start_url`、`scope`、`theme_color`、`background_color`（`#F6F5F2`），以及 192、512 和 maskable 圖示。
 2. **iOS 設定**：在 `<head>` 加入 `apple-touch-icon`（180×180）、`apple-mobile-web-app-capable`、`apple-mobile-web-app-title`、`apple-mobile-web-app-status-bar-style`。
 3. **App 圖示**：需要重新設計，建議簡潔、使用主色深綠。
 4. **Service Worker**：app shell 採 cache-first 策略，快取名稱要帶版本號，更新時清除舊快取。發現新版時提示使用者重新載入，或在下次開啟時自動套用。

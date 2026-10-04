@@ -5,13 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#F6F5F2" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#121211" media="(prefers-color-scheme: dark)">
-<title>酷酷擼鐵</title>
+<title>別肌動</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="酷酷擼鐵">
+<meta name="apple-mobile-web-app-title" content="別肌動">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <script src="vendor/chart.umd.min.js"></script>
 <style>
@@ -1001,7 +1001,7 @@ function openSettings(){
 }
 async function exportData(){
   const text=JSON.stringify({app:'gymlog',version:4,exported:new Date().toISOString(),...S},null,1);
-  const filename=`酷酷擼鐵備份-${todayStr()}.json`;
+  const filename=`別肌動備份-${todayStr()}.json`;
   const file=new File([text],filename,{type:'application/json'});
   /* iOS: share sheet → 儲存到「檔案」; elsewhere fall back to a plain download */
   if(navigator.canShare&&navigator.canShare({files:[file]})){
@@ -1019,7 +1019,7 @@ function importFile(e){
   const f=e.target.files[0];if(!f)return;
   const r=new FileReader();
   r.onload=async()=>{
-    let d;try{d=JSON.parse(r.result);if(d.app!=='gymlog')throw 0}catch{toast('這不是酷酷擼鐵匯出的備份檔');return}
+    let d;try{d=JSON.parse(r.result);if(d.app!=='gymlog')throw 0}catch{toast('這不是別肌動匯出的備份檔');return}
     if(!await askConfirm('匯入會合併備份裡的紀錄，同一天的資料以備份為準。','匯入'))return;
     try{
       Object.assign(S.meta.exercises,d.meta?.exercises||{});if(d.meta?.height)S.meta.height=d.meta.height;
