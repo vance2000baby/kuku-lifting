@@ -246,6 +246,18 @@ body.has-dock .toast{bottom:calc(var(--tab-h) + var(--dock-h) + var(--safe-b) + 
 .day[aria-current="date"] b{background:var(--text);color:var(--bg)}
 .calbtn input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
 
+/* training calendar (進度) */
+.cal-h{display:flex;align-items:center;justify-content:space-between;margin:calc(var(--s2) * -1) calc(var(--s2) * -1) var(--s2) 0}
+.cal-h .iconbtn:disabled{color:var(--disabled);background:none;cursor:default}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);row-gap:var(--s1);text-align:center}
+.cal-wd{font:400 13px/18px var(--font);color:var(--text-3);padding-bottom:var(--s1)}
+.cal-d{height:44px;border:0;background:none;padding:0;display:grid;place-items:center;font:500 15px/20px var(--font);font-variant-numeric:tabular-nums;color:var(--text-2)}
+.cal-d b{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font:inherit}
+.cal-d.on b{background:var(--primary);color:var(--on-primary);font-weight:600}
+button.cal-d:active b{background:var(--primary-press)}
+.cal-d.today:not(.on) b{box-shadow:inset 0 0 0 2px var(--primary);color:var(--primary);font-weight:600}
+.cal-d.future{color:var(--disabled)}
+
 /* exercise block */
 .exs{margin-top:var(--s4)}
 .exs-h{display:flex;align-items:flex-start;gap:var(--s2);padding:var(--s4) var(--s2) 0 var(--s4)}
@@ -356,7 +368,7 @@ const IC={
    STATE & STORAGE
    ========================================================= */
 let S={meta:{height:null,unit:'kg',rest:90,autoRest:false,exercises:{}},sessions:{},body:{}};
-let ui={tab:'train',date:todayStr(),range:90,prog:null,lastEx:null,newCat:null,newUnit:'kg',newLoad:'single',edit:null};
+let ui={tab:'train',date:todayStr(),range:90,calMonth:todayStr().slice(0,7),prog:null,lastEx:null,newCat:null,newUnit:'kg',newLoad:'single',edit:null};
 let store=null;
 
 async function initStore(){
@@ -785,6 +797,26 @@ const rangeSeg=()=>`<div class="seg" role="group" aria-label="時間範圍">${[[
 /* =========================================================
    SCREEN: 進度
    ========================================================= */
+/* month grid, weeks start on Monday like weekKey(); a day counts once it has a completed set */
+function calendar(){
+  const ym=ui.calMonth, y=+ym.slice(0,4), m=+ym.slice(5,7), t=todayStr(), all=sessionDates();
+  const trained=new Set(all.filter(d=>d.startsWith(ym)));
+  const lead=(new Date(y,m-1,1).getDay()+6)%7, n=new Date(y,m,0).getDate();
+  const cells=Array.from({length:lead},()=>'<span></span>');
+  for(let i=1;i<=n;i++){
+    const d=`${ym}-${pad(i)}`, on=trained.has(d), cls=`cal-d ${on?'on':''} ${d===t?'today':''} ${d>t?'future':''}`;
+    const label=`${mdLong(d)} 週${wd(d)}${on?'，有訓練':''}${d===t?'，今天':''}`;
+    cells.push(on?`<button class="${cls}" data-act="openday" data-d="${d}" aria-label="${label}"><b>${i}</b></button>`
+      :`<span class="${cls}" aria-label="${label}"><b>${i}</b></span>`);
+  }
+  const atNow=ym>=t.slice(0,7), atFirst=!all.length||ym<=all[0].slice(0,7);
+  return `<section class="sec" style="margin-top:0"><div class="sec-h"><h2 class="t-h3">訓練月曆</h2></div>
+    <div class="group pad">
+      <div class="cal-h"><p class="t-callout">${y}年${m}月　<span class="c2">練了 ${trained.size} 天</span></p>
+        <span style="display:flex"><button class="iconbtn" data-act="calmonth" data-n="-1" aria-label="上個月" ${atFirst?'disabled':''}>${IC.chevL}</button><button class="iconbtn" data-act="calmonth" data-n="1" aria-label="下個月" ${atNow?'disabled':''}>${IC.chevR}</button></span></div>
+      <div class="cal" role="group" aria-label="${y}年${m}月訓練月曆">${[...'一二三四五六日'].map(w=>`<span class="cal-wd" aria-hidden="true">${w}</span>`).join('')}${cells.join('')}</div>
+    </div></section>`;
+}
 function renderProg(){
   if(ui.prog&&allExercises().includes(ui.prog))return renderProgDetail();
   ui.prog=null;
@@ -797,7 +829,8 @@ function renderProg(){
   const used=CATS.filter(c=>wk.some(k=>weeks[k].cat[c]));
   app.innerHTML=`${header('進度')}
   ${backupNotice()}
-  ${rangeSeg()}
+  ${calendar()}
+  <div style="margin-top:var(--s7)">${rangeSeg()}</div>
   <section class="sec" style="margin-top:24px"><div class="sec-h"><h2 class="t-h3">每週訓練量</h2><span class="t-caption c2">${U()}</span></div>
     <div class="group pad">${dates.length?`<p class="t-callout c2">${dates.length} 次訓練　平均每週 ${fmt(dates.length/Math.max(1,wk.length))} 次　共 ${volTxt(total)}</p>
       <div class="cw" style="margin-top:16px"><canvas id="cWk" aria-label="每週訓練量長條圖"></canvas></div>
@@ -1065,6 +1098,7 @@ document.body.addEventListener('click',e=>{
     case 'export': exportData();break;
     case 'snoozebackup': try{localStorage.setItem(SNOOZE_K,addDays(todayStr(),3))}catch{}render();break;
     case 'range': ui.range=+b.dataset.n;render();break;
+    case 'calmonth':{const [y,m]=ui.calMonth.split('-').map(Number),x=new Date(y,m-1+(+b.dataset.n),1);ui.calMonth=ymd(x).slice(0,7);render();break}
   }
 });
 app.addEventListener('input',e=>{
