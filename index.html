@@ -24,23 +24,39 @@
   --fill:#EFEEEA; --fill-2:#E4E2DC;
   --text:#1C1C1A; --text-2:#5F5E59; --text-3:#97958F;
   --border:#D9D7D1; --divider:#E9E7E2;
-  --primary:#1F6B4F; --primary-press:#17573F; --on-primary:#FFFFFF; --primary-soft:#E2EEE8;
+  --primary:#1F6B4F; --primary-hi:#2B8462; --primary-press:#17573F; --on-primary:#FFFFFF; --primary-soft:#E2EEE8;
   --success:#237A4F; --warning:#A2650F; --warning-soft:#F7EAD2; --error:#BE3B28; --on-error:#FFFFFF;
-  --disabled:#C3C1BB; --scrim:rgba(20,20,18,.36);
+  --disabled:#C3C1BB; --scrim:rgba(20,20,18,.26);
   /* data colors (charts only) */
   --cat-legs:#C8553D; --cat-back:#3D6CA8; --cat-chest:#C29129; --cat-shoulder:#2E8559;
   --cat-arms:#8467AE; --cat-core:#7B7974; --cat-other:#B4B2AC;
-  /* elevation — floating layers only */
-  --e1:0 1px 2px rgba(20,20,18,.06),0 10px 32px rgba(20,20,18,.14);
+  /* Liquid Glass — floating control layer only (tab bar, toolbars, dock, sheets, dialogs, toasts) */
+  --glass:rgba(255,255,255,.56);           /* bars, buttons */
+  --glass-thick:rgba(249,248,245,.82);     /* sheets, dialogs: carry content, so less see-through */
+  --glass-cell:rgba(255,255,255,.74);      /* grouped rows inside a glass sheet */
+  --glass-rim:rgba(255,255,255,.9);        /* specular top edge */
+  --glass-rim-2:rgba(255,255,255,.4);      /* inner stroke + lower edge */
+  --glass-edge:rgba(20,20,18,.07);         /* hairline that separates glass from light content */
+  --glass-sheen:linear-gradient(180deg,rgba(255,255,255,.5),rgba(255,255,255,0) 52%);
+  --glass-shadow:0 1px 1px rgba(20,20,18,.04),0 6px 18px rgba(20,20,18,.09),0 18px 44px rgba(20,20,18,.08);
+  --glass-blur:blur(22px) saturate(190%);
+  --glass-blur-thick:blur(40px) saturate(180%);
+  --lens:rgba(20,20,18,.065);              /* selected tab / pressed state on glass */
+  --thumb:#FFFFFF;                         /* segmented-control thumb */
+  --thumb-shadow:0 1px 2px rgba(20,20,18,.08),0 3px 10px rgba(20,20,18,.08);
+  --btn-hl:rgba(255,255,255,.26);          /* top highlight on filled buttons */
+  --amb-1:rgba(31,107,79,.13); --amb-2:rgba(194,145,41,.09); --amb-3:rgba(61,108,168,.06);
   /* spacing */
   --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:20px; --s6:24px; --s7:32px; --s8:40px;
-  /* radius */
-  --r-sm:10px; --r-md:14px; --r-lg:20px; --r-full:999px;
+  /* radius — concentric: sheet (xl) − 16px padding = card (md) */
+  --r-sm:12px; --r-md:20px; --r-lg:28px; --r-xl:36px; --r-full:999px;
   /* type */
   --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang TC","Noto Sans TC","Noto Sans CJK TC","Microsoft JhengHei",Roboto,"Helvetica Neue",sans-serif;
-  /* layout */
-  --tab-h:56px; --dock-h:64px; --page-max:600px;
+  /* layout: floating tab bar + dock */
+  --tab-h:62px; --dock-h:56px; --page-max:600px;
   --safe-b:env(safe-area-inset-bottom,0px);
+  --tab-b:max(var(--s3),calc(var(--safe-b) - var(--s2)));
+  --dock-b:calc(var(--tab-b) + var(--tab-h) + var(--s3));
   box-sizing:border-box;
   padding-top:env(safe-area-inset-top,0px);
   color-scheme:light;
@@ -49,28 +65,50 @@
   :root:not([data-theme="light"]){
     --bg:#121211; --surface:#1C1C1A; --elevated:#262624; --fill:#2A2A27; --fill-2:#34342F;
     --text:#F2F1EE; --text-2:#A9A7A1; --text-3:#75736E; --border:#3B3A36; --divider:#2B2A27;
-    --primary:#62C095; --primary-press:#4FAA81; --on-primary:#0D1A13; --primary-soft:#1D3228;
+    --primary:#62C095; --primary-hi:#7DD2AA; --primary-press:#4FAA81; --on-primary:#0D1A13; --primary-soft:#1D3228;
     --success:#6CC79A; --warning:#E2A647; --warning-soft:#392D17; --error:#EF7A66; --on-error:#1C0D0A;
-    --disabled:#55534F; --scrim:rgba(0,0,0,.55);
+    --disabled:#55534F; --scrim:rgba(0,0,0,.45);
     --cat-legs:#E07A63; --cat-back:#6E98D3; --cat-chest:#DDB04E; --cat-shoulder:#5DB585; --cat-arms:#A88BD1; --cat-core:#9A9893; --cat-other:#5E5C58;
-    --e1:0 1px 2px rgba(0,0,0,.4),0 12px 36px rgba(0,0,0,.55);
+    --glass:rgba(46,46,43,.52); --glass-thick:rgba(30,30,28,.8); --glass-cell:rgba(255,255,255,.06);
+    --glass-rim:rgba(255,255,255,.2); --glass-rim-2:rgba(255,255,255,.07); --glass-edge:rgba(0,0,0,.45);
+    --glass-sheen:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,0) 52%);
+    --glass-shadow:0 1px 1px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.42),0 20px 52px rgba(0,0,0,.34);
+    --lens:rgba(255,255,255,.1); --thumb:#55554F; --thumb-shadow:0 1px 2px rgba(0,0,0,.35),0 3px 10px rgba(0,0,0,.3);
+    --btn-hl:rgba(255,255,255,.22);
+    --amb-1:rgba(98,192,149,.13); --amb-2:rgba(221,176,78,.06); --amb-3:rgba(110,152,211,.08);
     color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
-  --bg:#121211; --surface:#1C1C1A; --elevated:#262624; --fill:#2A2A27; --fill-2:#34342F;
-  --text:#F2F1EE; --text-2:#A9A7A1; --text-3:#75736E; --border:#3B3A36; --divider:#2B2A27;
-  --primary:#62C095; --primary-press:#4FAA81; --on-primary:#0D1A13; --primary-soft:#1D3228;
-  --success:#6CC79A; --warning:#E2A647; --warning-soft:#392D17; --error:#EF7A66; --on-error:#1C0D0A;
-  --disabled:#55534F; --scrim:rgba(0,0,0,.55);
-  --cat-legs:#E07A63; --cat-back:#6E98D3; --cat-chest:#DDB04E; --cat-shoulder:#5DB585; --cat-arms:#A88BD1; --cat-core:#9A9893; --cat-other:#5E5C58;
-  --e1:0 1px 2px rgba(0,0,0,.4),0 12px 36px rgba(0,0,0,.55);
-  color-scheme:dark;
+    --bg:#121211; --surface:#1C1C1A; --elevated:#262624; --fill:#2A2A27; --fill-2:#34342F;
+    --text:#F2F1EE; --text-2:#A9A7A1; --text-3:#75736E; --border:#3B3A36; --divider:#2B2A27;
+    --primary:#62C095; --primary-hi:#7DD2AA; --primary-press:#4FAA81; --on-primary:#0D1A13; --primary-soft:#1D3228;
+    --success:#6CC79A; --warning:#E2A647; --warning-soft:#392D17; --error:#EF7A66; --on-error:#1C0D0A;
+    --disabled:#55534F; --scrim:rgba(0,0,0,.45);
+    --cat-legs:#E07A63; --cat-back:#6E98D3; --cat-chest:#DDB04E; --cat-shoulder:#5DB585; --cat-arms:#A88BD1; --cat-core:#9A9893; --cat-other:#5E5C58;
+    --glass:rgba(46,46,43,.52); --glass-thick:rgba(30,30,28,.8); --glass-cell:rgba(255,255,255,.06);
+    --glass-rim:rgba(255,255,255,.2); --glass-rim-2:rgba(255,255,255,.07); --glass-edge:rgba(0,0,0,.45);
+    --glass-sheen:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,0) 52%);
+    --glass-shadow:0 1px 1px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.42),0 20px 52px rgba(0,0,0,.34);
+    --lens:rgba(255,255,255,.1); --thumb:#55554F; --thumb-shadow:0 1px 2px rgba(0,0,0,.35),0 3px 10px rgba(0,0,0,.3);
+    --btn-hl:rgba(255,255,255,.22);
+    --amb-1:rgba(98,192,149,.13); --amb-2:rgba(221,176,78,.06); --amb-3:rgba(110,152,211,.08);
+    color-scheme:dark;
+}
+/* Reduce Transparency, or no backdrop-filter: glass becomes solid */
+@media (prefers-reduced-transparency: reduce){
+  :root:root:root{--glass:var(--elevated);--glass-thick:var(--bg);--glass-cell:var(--surface)}
+}
+@supports not ((-webkit-backdrop-filter:blur(1px)) or (backdrop-filter:blur(1px))){
+  :root:root:root{--glass:var(--elevated);--glass-thick:var(--bg);--glass-cell:var(--surface)}
+}
+@media (prefers-contrast: more){
+  :root:root:root{--glass-edge:var(--border);--glass-thick:var(--bg)}
 }
 
 /* typography scale */
-.t-display{font:700 34px/40px var(--font);letter-spacing:-.005em}
-.t-h1{font:700 28px/34px var(--font)}
+.t-display{font:700 34px/41px var(--font);letter-spacing:-.01em}
+.t-h1{font:700 28px/34px var(--font);letter-spacing:-.005em}
 .t-h2{font:600 20px/26px var(--font)}
 .t-h3{font:600 17px/22px var(--font)}
 .t-body{font:400 17px/24px var(--font)}
@@ -85,10 +123,10 @@
    2. BASE
    ========================================================= */
 *,*::before,*::after{box-sizing:border-box}
-html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%;touch-action:manipulation}
+html{background:var(--bg);scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%;touch-action:manipulation}
 /* the page only ever scrolls vertically */
 html,body{overflow-x:hidden;overflow-x:clip;overscroll-behavior-x:none;max-width:100%}
-body{margin:0;background:var(--bg);color:var(--text);font:400 17px/24px var(--font);-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased}
+body{margin:0;background:transparent;color:var(--text);font:400 17px/24px var(--font);-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased}
 h1,h2,h3,p{margin:0}
 button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer;touch-action:manipulation}
@@ -96,42 +134,67 @@ button{cursor:pointer;touch-action:manipulation}
 svg{display:block}
 .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
-.page{max-width:var(--page-max);margin:0 auto;padding:0 var(--s4) calc(var(--tab-h) + var(--safe-b) + var(--s7))}
-body.has-dock .page{padding-bottom:calc(var(--tab-h) + var(--dock-h) + var(--safe-b) + var(--s7))}
+/* ambient light behind everything, so the glass layer has something to pick up */
+.ambient{position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:radial-gradient(120% 55% at 0% 0%,var(--amb-1),transparent 62%),radial-gradient(90% 45% at 100% 4%,var(--amb-2),transparent 60%),radial-gradient(80% 50% at 50% 100%,var(--amb-3),transparent 70%)}
+/* scroll edge effects: content softens as it passes under the status bar and the floating bars */
+.edge{position:fixed;left:0;right:0;z-index:8;pointer-events:none;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.edge-top{top:0;height:calc(env(safe-area-inset-top,0px) + var(--s4));background:linear-gradient(color-mix(in srgb,var(--bg) 72%,transparent),transparent);-webkit-mask-image:linear-gradient(#000 45%,transparent);mask-image:linear-gradient(#000 45%,transparent)}
+.edge-bottom{bottom:0;height:calc(var(--tab-b) + var(--tab-h) + var(--s7));background:linear-gradient(transparent,color-mix(in srgb,var(--bg) 60%,transparent));-webkit-mask-image:linear-gradient(transparent,#000 55%);mask-image:linear-gradient(transparent,#000 55%)}
+body.has-dock .edge-bottom{height:calc(var(--dock-b) + var(--dock-h) + var(--s6))}
+
+.page{max-width:var(--page-max);margin:0 auto;padding:0 var(--s4) calc(var(--tab-b) + var(--tab-h) + var(--s7))}
+body.has-dock .page{padding-bottom:calc(var(--dock-b) + var(--dock-h) + var(--s7))}
 
 /* =========================================================
-   3. COMPONENTS
+   3. MATERIAL
    ========================================================= */
-/* Button */
-.btn{min-height:48px;padding:0 var(--s4);border:0;border-radius:var(--r-sm);display:inline-flex;align-items:center;justify-content:center;gap:var(--s2);font:600 17px/22px var(--font);white-space:nowrap;transition:background-color .12s}
-.btn svg{width:20px;height:20px;flex:none}
-.btn-primary{background:var(--primary);color:var(--on-primary)}
-.btn-primary:active{background:var(--primary-press)}
-.btn-secondary{background:var(--fill);color:var(--text)}
-.btn-secondary:active{background:var(--fill-2)}
-.btn-plain{min-height:44px;padding:0 var(--s2);background:none;color:var(--primary);font-weight:500}
-.btn-plain:active{opacity:.6}
-.btn-destructive{background:none;color:var(--error);font-weight:500}
-.btn-block{width:100%}
-.btn:disabled{background:var(--fill);color:var(--disabled);cursor:default}
-.iconbtn{width:44px;height:44px;flex:none;border:0;background:none;border-radius:var(--r-sm);display:grid;place-items:center;color:var(--text-2);position:relative}
-.iconbtn svg{width:22px;height:22px}
-.iconbtn:active{background:var(--fill)}
+/* .glass: translucent, refracting control surface. Specular rim on top, inner stroke, soft layered shadow,
+   and a sheen that sits under the content (isolation keeps the ::before behind children) */
+.glass{position:relative;isolation:isolate;background:var(--glass);-webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);
+  box-shadow:inset 0 1px 0 var(--glass-rim),inset 0 -1px 0 var(--glass-rim-2),inset 0 0 0 .5px var(--glass-rim-2),0 0 0 .5px var(--glass-edge),var(--glass-shadow)}
+.glass::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;background:var(--glass-sheen);pointer-events:none}
 
-/* Page header */
-.ph{padding:var(--s3) 0 var(--s3)}
-.ph-row{display:flex;align-items:center;justify-content:space-between;gap:var(--s2);min-height:44px}
-.ph-act{display:flex;align-items:center;margin-right:calc(var(--s3) * -1)}
+/* =========================================================
+   4. COMPONENTS
+   ========================================================= */
+/* Button — capsules; filled ones get a top highlight like a lit glass edge */
+.btn{min-height:50px;padding:0 var(--s5);border:0;border-radius:var(--r-full);display:inline-flex;align-items:center;justify-content:center;gap:var(--s2);font:600 17px/22px var(--font);white-space:nowrap;
+  transition:transform .35s cubic-bezier(.3,1.5,.5,1),background-color .15s,filter .15s,opacity .15s}
+.btn:active{transform:scale(.96)}
+.btn svg{width:20px;height:20px;flex:none}
+.btn-primary{background:linear-gradient(180deg,var(--primary-hi),var(--primary));color:var(--on-primary);
+  box-shadow:inset 0 1px 0 var(--btn-hl),inset 0 0 0 .5px var(--btn-hl),0 1px 2px color-mix(in srgb,var(--primary) 28%,transparent),0 8px 20px color-mix(in srgb,var(--primary) 24%,transparent)}
+.btn-primary:active{filter:brightness(.92)}
+.btn-secondary{background:var(--fill);color:var(--text);box-shadow:inset 0 1px 0 var(--glass-rim-2)}
+.btn-secondary:active{background:var(--fill-2)}
+.btn-plain{min-height:44px;padding:0 var(--s3);background:none;color:var(--primary);font-weight:500}
+.btn-plain:active{opacity:.55;transform:none}
+.btn-destructive{background:none;color:var(--error);font-weight:500}
+.btn-danger{background:var(--error);color:var(--on-error);box-shadow:inset 0 1px 0 var(--btn-hl)}
+.btn.glass{color:var(--text)}
+.btn-block{width:100%}
+.btn:disabled{background:var(--fill);color:var(--disabled);box-shadow:none;filter:none;transform:none;cursor:default}
+.iconbtn{width:44px;height:44px;flex:none;border:0;background:none;border-radius:var(--r-full);display:grid;place-items:center;color:var(--text-2);position:relative;transition:background-color .15s,transform .3s cubic-bezier(.3,1.5,.5,1)}
+.iconbtn svg{width:22px;height:22px}
+.iconbtn:active{background:var(--lens);transform:scale(.92)}
+
+/* Page header — large title; toolbar items grouped in one glass capsule */
+.ph{padding:var(--s2) 0 var(--s4)}
+.ph-row{display:flex;align-items:center;justify-content:space-between;gap:var(--s2);min-height:48px}
+.ph-act{display:flex;align-items:center;flex:none;border-radius:var(--r-full);padding:0 2px}
+.ph-act .iconbtn{color:var(--text)}
+.ph-act .btn-plain{padding:0 var(--s3) 0 var(--s4)}
 .ph-sub{margin-top:var(--s1)}
-.back{margin-left:calc(var(--s2) * -1);gap:2px}
+.back{min-height:44px;padding:0 var(--s4) 0 var(--s2);gap:2px;font-weight:500}
 .back svg{width:20px;height:20px}
 
-/* Section + group + row */
+/* Section + group + row (content layer: solid, never glass) */
 .sec{margin-top:var(--s7)}
-.sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:var(--s3);padding:0 var(--s1) var(--s2)}
+.sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:var(--s3);padding:0 var(--s2) var(--s2)}
 .group{background:var(--surface);border-radius:var(--r-md);overflow:hidden}
 .pad{padding:var(--s4)}
-.row{position:relative;display:flex;align-items:center;gap:var(--s3);min-height:56px;padding:var(--s3) var(--s4);width:100%;border:0;background:none;text-align:left}
+.row{position:relative;display:flex;align-items:center;gap:var(--s3);min-height:56px;padding:var(--s3) var(--s4);width:100%;border:0;background:none;text-align:left;transition:background-color .15s}
 button.row:active{background:var(--fill)}
 .row+.row::before,.row+.setw::before{content:"";position:absolute;top:0;left:var(--s4);right:0;height:1px;background:var(--divider)}
 .row-main{flex:1;min-width:0}
@@ -139,14 +202,15 @@ button.row:active{background:var(--fill)}
 .row-end{flex:none;text-align:right}
 .chev{width:16px;height:16px;color:var(--text-3);flex:none}
 
-/* Segmented control */
-.seg{display:flex;background:var(--fill);border-radius:var(--r-sm);padding:2px;gap:2px}
-.seg button{flex:1;min-height:36px;border:0;background:none;border-radius:calc(var(--r-sm) - 2px);font:500 15px/20px var(--font);color:var(--text-2);padding:0 var(--s2)}
-.seg button[aria-pressed="true"]{background:var(--elevated);color:var(--text);box-shadow:0 1px 2px rgba(0,0,0,.1)}
+/* Segmented control — capsule track, lifted thumb */
+.seg{display:flex;background:var(--fill);border-radius:var(--r-full);padding:3px;gap:2px}
+.seg button{flex:1;min-height:36px;border:0;background:none;border-radius:var(--r-full);font:500 15px/20px var(--font);color:var(--text-2);padding:0 var(--s2);transition:color .2s,background-color .2s}
+.seg button[aria-pressed="true"]{background:var(--thumb);color:var(--text);font-weight:600;box-shadow:var(--thumb-shadow),inset 0 0 0 .5px var(--glass-edge)}
 
 /* Choice grid (category) */
 .choices{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s2)}
-.choices button{min-height:44px;border:1px solid var(--border);background:var(--surface);border-radius:var(--r-sm);font:500 15px/20px var(--font);color:var(--text)}
+.choices button{min-height:44px;border:1px solid var(--border);background:var(--surface);border-radius:var(--r-full);font:500 15px/20px var(--font);color:var(--text);transition:transform .3s cubic-bezier(.3,1.5,.5,1)}
+.choices button:active{transform:scale(.95)}
 .choices button[aria-pressed="true"]{border-color:var(--primary);background:var(--primary-soft);color:var(--primary);font-weight:600}
 
 /* Inputs */
@@ -170,66 +234,81 @@ select.field{appearance:none;-webkit-appearance:none;background-image:linear-gra
 /* Toggle */
 .toggle{position:relative;width:51px;height:31px;flex:none}
 .toggle input{position:absolute;inset:0;margin:0;opacity:0;cursor:pointer}
-.toggle span{position:absolute;inset:0;border-radius:var(--r-full);background:var(--fill-2);transition:background-color .2s;pointer-events:none}
-.toggle span::after{content:"";position:absolute;left:2px;top:2px;width:27px;height:27px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .2s}
+.toggle span{position:absolute;inset:0;border-radius:var(--r-full);background:color-mix(in srgb,var(--text) 15%,transparent);transition:background-color .2s;pointer-events:none}
+.toggle span::after{content:"";position:absolute;left:2px;top:2px;width:27px;height:27px;border-radius:50%;background:var(--thumb);box-shadow:var(--thumb-shadow);transition:transform .35s cubic-bezier(.3,1.4,.5,1)}
 .toggle input:checked+span{background:var(--primary)}
 .toggle input:checked+span::after{transform:translateX(20px)}
 .toggle input:focus-visible+span{outline:2px solid var(--primary);outline-offset:2px}
 
-/* Tab bar */
-.tabs{position:fixed;left:0;right:0;bottom:0;z-index:10;background:var(--surface);border-top:1px solid var(--divider);padding-bottom:var(--safe-b)}
-.tabs-in{max-width:var(--page-max);margin:0 auto;display:flex}
-.tabs button{flex:1;height:var(--tab-h);border:0;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--text-3);font:500 12px/16px var(--font)}
+/* Tab bar — floating glass capsule; the lens slides to the selected tab */
+.tabs{position:fixed;left:var(--s4);right:var(--s4);bottom:var(--tab-b);z-index:10;max-width:400px;margin:0 auto;height:var(--tab-h);padding:4px;border-radius:var(--r-full)}
+.tabs-in{position:relative;display:flex;height:100%}
+.tab-lens{position:absolute;top:0;bottom:0;left:0;width:calc(100% / 3);border-radius:var(--r-full);background:var(--lens);box-shadow:inset 0 1px 0 var(--glass-rim-2);transform:translateX(calc(var(--tab-i,0) * 100%));transition:transform .55s cubic-bezier(.34,1.36,.5,1)}
+.tabs button{position:relative;flex:1;border:0;background:none;border-radius:var(--r-full);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;color:var(--text-2);font:600 12px/14px var(--font);transition:color .2s,transform .3s cubic-bezier(.3,1.5,.5,1)}
 .tabs button svg{width:24px;height:24px}
+.tabs button:active{transform:scale(.92)}
 .tabs button[aria-current="page"]{color:var(--primary)}
 
-/* Dock (one floating layer above the tab bar) */
-.dock{position:fixed;left:0;right:0;bottom:calc(var(--tab-h) + var(--safe-b));z-index:9;background:var(--bg);border-top:1px solid var(--divider)}
+/* Dock — floating controls above the tab bar (rest timer + 新增動作) */
+.dock{position:fixed;left:var(--s4);right:var(--s4);bottom:var(--dock-b);z-index:9;max-width:calc(var(--page-max) - var(--s7));margin:0 auto;pointer-events:none}
 .dock[hidden]{display:none}
-.dock-in{position:relative;max-width:var(--page-max);margin:0 auto;height:var(--dock-h);display:flex;align-items:center;gap:var(--s2);padding:0 var(--s4)}
-.dock-in>.btn{min-height:48px}
+.dock-in{display:flex;align-items:stretch;gap:var(--s2);height:var(--dock-h)}
+.dock-in>*{pointer-events:auto}
+.dock-in>.btn{min-height:0;height:100%}
 .dock .grow{flex:1}
-.timer-main{flex:1;min-width:0;display:flex;align-items:baseline;gap:var(--s3)}
-.timer-main b{font:600 28px/34px var(--font);font-variant-numeric:tabular-nums;min-width:72px}
+.dock-rest{padding:0 var(--s5) 0 var(--s4);font-variant-numeric:tabular-nums}
+.timer{flex:1;min-width:0;display:flex;align-items:center;gap:var(--s1);padding:0 6px 0 var(--s5);border-radius:var(--r-full);overflow:hidden}
+.timer-main{flex:1;min-width:0;display:flex;align-items:baseline;gap:var(--s2)}
+.timer-main b{font:600 26px/32px var(--font);font-variant-numeric:tabular-nums;min-width:64px}
 .timer-main span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.timer .btn{min-width:56px;padding:0 var(--s3);font-weight:500}
-.timer-bar{position:absolute;left:0;top:-1px;height:2px;background:var(--primary);transition:width .25s linear}
+.timer .btn{min-height:44px;height:44px;min-width:48px;padding:0 var(--s3);font:600 15px/20px var(--font);background:var(--lens);color:var(--text);box-shadow:none}
+/* remaining time as a soft green sweep inside the capsule */
+.timer-bar{position:absolute;left:0;top:0;bottom:0;z-index:-1;background:color-mix(in srgb,var(--primary) 15%,transparent);transition:width .25s linear}
 .timer.done .timer-main b{color:var(--primary)}
 
-/* Bottom sheet */
-.scrim{position:fixed;inset:0;z-index:20;background:var(--scrim);opacity:0;pointer-events:none;transition:opacity .2s}
+/* Bottom sheet — thick glass, floats inset from the screen edges */
+.scrim{position:fixed;inset:0;z-index:20;background:var(--scrim);opacity:0;pointer-events:none;transition:opacity .25s}
 .scrim.open{opacity:1;pointer-events:auto}
 /* --kb / --vvh / --vvtop come from visualViewport (see trackKeyboard). The iOS keyboard is translucent and overlays the page,
-   so sheets keep reaching the screen bottom (their background shows behind the keyboard) and pad their content up above it */
-.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;max-width:var(--page-max);margin:0 auto;max-height:calc(var(--vvh,100vh) * .9 + var(--kb,0px));display:flex;flex-direction:column;background:var(--bg);border-radius:var(--r-lg) var(--r-lg) 0 0;box-shadow:var(--e1);transform:translateY(105%);transition:transform .32s cubic-bezier(.32,.72,0,1);padding-bottom:max(var(--safe-b),var(--kb,0px))}
-/* top pinned just below the status bar: the header never moves while results change or the keyboard opens */
-.sheet.tall{top:calc(var(--vvtop,0px) + env(safe-area-inset-top,0px) + var(--s3));max-height:none}
+   so sheets keep reaching down behind it and pad their content up above it */
+.sheet{position:fixed;left:var(--s2);right:var(--s2);bottom:var(--s2);z-index:21;max-width:calc(var(--page-max) - var(--s4));margin:0 auto;max-height:calc(var(--vvh,100vh) * .9 + var(--kb,0px) - var(--s2));display:flex;flex-direction:column;
+  background:var(--glass-thick);-webkit-backdrop-filter:var(--glass-blur-thick);backdrop-filter:var(--glass-blur-thick);border-radius:var(--r-xl);
+  box-shadow:inset 0 1px 0 var(--glass-rim),inset 0 0 0 .5px var(--glass-rim-2),0 0 0 .5px var(--glass-edge),var(--glass-shadow);
+  transform:translateY(calc(100% + var(--s7)));transition:transform .42s cubic-bezier(.32,.72,0,1);padding-bottom:max(calc(var(--safe-b) - var(--s2)),calc(var(--kb,0px) - var(--s2)),0px)}
+/* tall: edge-attached, top pinned just below the status bar — the header never moves while results change or the keyboard opens */
+.sheet.tall{left:0;right:0;bottom:0;max-width:var(--page-max);top:calc(var(--vvtop,0px) + env(safe-area-inset-top,0px) + var(--s3));max-height:none;border-radius:var(--r-xl) var(--r-xl) 0 0;padding-bottom:max(var(--safe-b),var(--kb,0px))}
 .sheet.tall .sheet-b{flex:1}
-.sheet-search{flex:1;min-width:0;margin-right:var(--s1)}
+.sheet-search{flex:1;min-width:0;margin-right:var(--s1);border-radius:var(--r-full)}
 .sheet-search input{-webkit-appearance:none;appearance:none}
 #sugg>:first-child{margin-top:var(--s2)!important}
-.sheet:not(.open){visibility:hidden;transition:transform .32s cubic-bezier(.32,.72,0,1),visibility 0s .32s}
+.sheet:not(.open){visibility:hidden;transition:transform .42s cubic-bezier(.32,.72,0,1),visibility 0s .42s}
 .sheet.open{transform:none}
 .sheet-top{flex:none;padding-top:var(--s2);touch-action:none}
-.grab{width:36px;height:5px;border-radius:var(--r-full);background:var(--border);margin:0 auto}
-.sheet-h{display:flex;align-items:center;justify-content:space-between;padding:var(--s2) var(--s2) var(--s2) var(--s4);min-height:52px}
+.grab{width:36px;height:5px;border-radius:var(--r-full);background:var(--text-3);opacity:.35;margin:0 auto}
+.sheet-h{display:flex;align-items:center;justify-content:space-between;padding:var(--s1) var(--s3) var(--s2) var(--s5);min-height:52px}
+.sheet-h .iconbtn{background:var(--lens);color:var(--text)}
 .sheet-b{overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:var(--s2) var(--s4) var(--s6)}
 .sheet-b>.group+.group,.sheet-b>.group+.sec-h{margin-top:var(--s6)}
+.sheet .group{background:var(--glass-cell)}
+/* on glass, opaque dividers vanish (dark) or look pasted on (light): use a translucent ink instead */
+.sheet .row+.row::before,.sheet .row+.setw::before{background:color-mix(in srgb,var(--text) 9%,transparent)}
 .actions .row{min-height:52px}
 
 /* Dialog */
-.dlg{position:fixed;inset:0;z-index:40;display:grid;place-items:center;padding:var(--s6);background:var(--scrim);opacity:0;pointer-events:none;transition:opacity .15s}
+.dlg{position:fixed;inset:0;z-index:40;display:grid;place-items:center;padding:var(--s6);background:var(--scrim);opacity:0;pointer-events:none;transition:opacity .2s}
 .dlg.open{opacity:1;pointer-events:auto}
-.dlg-box{width:min(320px,100%);background:var(--elevated);border-radius:var(--r-lg);padding:var(--s6) var(--s5) var(--s4);box-shadow:var(--e1)}
+.dlg-box{width:min(320px,100%);background:var(--glass-thick);-webkit-backdrop-filter:var(--glass-blur-thick);backdrop-filter:var(--glass-blur-thick);border-radius:var(--r-lg);padding:var(--s6) var(--s5) var(--s5);
+  box-shadow:inset 0 1px 0 var(--glass-rim),inset 0 0 0 .5px var(--glass-rim-2),0 0 0 .5px var(--glass-edge),var(--glass-shadow);transform:scale(1.06);transition:transform .35s cubic-bezier(.3,1.3,.5,1)}
+.dlg.open .dlg-box{transform:none}
 .dlg-acts{display:flex;gap:var(--s2);margin-top:var(--s5)}
 .dlg-acts .btn{flex:1}
-.btn-danger{background:var(--error);color:var(--on-error)}
+.dlg .btn-secondary{background:var(--lens)}
 
-/* Toast */
-.toast{position:fixed;left:50%;bottom:calc(var(--tab-h) + var(--safe-b) + var(--s3));z-index:30;transform:translate(-50%,8px);width:min(calc(var(--page-max) - 32px),calc(100% - 32px));min-height:48px;display:flex;align-items:center;justify-content:space-between;gap:var(--s3);padding:0 var(--s2) 0 var(--s4);background:var(--text);color:var(--bg);border-radius:var(--r-sm);box-shadow:var(--e1);opacity:0;pointer-events:none;transition:opacity .18s,transform .18s}
-body.has-dock .toast{bottom:calc(var(--tab-h) + var(--dock-h) + var(--safe-b) + var(--s3))}
+/* Toast — glass capsule */
+.toast{position:fixed;left:50%;bottom:calc(var(--tab-b) + var(--tab-h) + var(--s3));z-index:30;transform:translate(-50%,12px) scale(.96);width:min(calc(var(--page-max) - 32px),calc(100% - 32px));min-height:52px;display:flex;align-items:center;justify-content:space-between;gap:var(--s3);padding:0 var(--s2) 0 var(--s5);color:var(--text);border-radius:var(--r-full);opacity:0;pointer-events:none;transition:opacity .2s,transform .4s cubic-bezier(.3,1.3,.5,1)}
+body.has-dock .toast{bottom:calc(var(--dock-b) + var(--dock-h) + var(--s3))}
 .toast.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
-.toast button{min-height:44px;border:0;background:none;color:inherit;font:600 15px/20px var(--font);padding:0 var(--s3);text-decoration:underline;text-underline-offset:3px}
+.toast button{min-height:44px;border:0;background:var(--lens);border-radius:var(--r-full);color:var(--primary);font:600 15px/20px var(--font);padding:0 var(--s4)}
 
 /* Empty / loading */
 .empty{padding:var(--s8) var(--s4) var(--s6);text-align:center}
@@ -239,30 +318,31 @@ body.has-dock .toast{bottom:calc(var(--tab-h) + var(--dock-h) + var(--safe-b) + 
 .notice{display:flex;align-items:center;justify-content:space-between;gap:var(--s3);padding:var(--s3) var(--s4);background:var(--warning-soft);color:var(--text)}
 
 /* =========================================================
-   4. SCREEN-SPECIFIC
+   5. SCREEN-SPECIFIC
    ========================================================= */
 /* week strip */
 .week{display:grid;grid-template-columns:32px repeat(7,1fr) 32px;align-items:center;margin:0 calc(var(--s2) * -1) var(--s2)}
 .week .wk-nav{width:32px;height:56px;border:0;background:none;color:var(--text-3);display:grid;place-items:center}
 .week .wk-nav svg{width:18px;height:18px}
-.day{height:56px;border:0;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0}
+.day{height:58px;border:0;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0}
 .day span{font:400 13px/18px var(--font);color:var(--text-3)}
-.day b{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font:600 17px/22px var(--font);font-variant-numeric:tabular-nums}
+.day b{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font:600 17px/22px var(--font);font-variant-numeric:tabular-nums;transition:transform .3s cubic-bezier(.3,1.5,.5,1)}
+.day:active b{transform:scale(.9)}
 .day i{width:4px;height:4px;border-radius:50%;background:transparent}
 .day.has i{background:var(--text-3)}
 .day.today b{color:var(--primary)}
-.day[aria-current="date"] b{background:var(--text);color:var(--bg)}
+.day[aria-current="date"] b{background:linear-gradient(180deg,var(--primary-hi),var(--primary));color:var(--on-primary);box-shadow:inset 0 1px 0 var(--btn-hl),0 4px 12px color-mix(in srgb,var(--primary) 26%,transparent)}
 .calbtn input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
 
 /* training calendar (進度) */
 .cal-h{display:flex;align-items:center;justify-content:space-between;margin:calc(var(--s2) * -1) calc(var(--s2) * -1) var(--s2) 0}
-.cal-h .iconbtn:disabled{color:var(--disabled);background:none;cursor:default}
+.cal-h .iconbtn:disabled{color:var(--disabled);background:none;cursor:default;transform:none}
 .cal{display:grid;grid-template-columns:repeat(7,1fr);row-gap:var(--s1);text-align:center}
 .cal-wd{font:400 13px/18px var(--font);color:var(--text-3);padding-bottom:var(--s1)}
 .cal-d{height:44px;border:0;background:none;padding:0;display:grid;place-items:center;font:500 15px/20px var(--font);font-variant-numeric:tabular-nums;color:var(--text-2)}
-.cal-d b{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font:inherit}
-.cal-d.on b{background:var(--primary);color:var(--on-primary);font-weight:600}
-button.cal-d:active b{background:var(--primary-press)}
+.cal-d b{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font:inherit;transition:transform .3s cubic-bezier(.3,1.5,.5,1)}
+.cal-d.on b{background:linear-gradient(180deg,var(--primary-hi),var(--primary));color:var(--on-primary);font-weight:600;box-shadow:inset 0 1px 0 var(--btn-hl)}
+button.cal-d:active b{transform:scale(.9)}
 .cal-d.today:not(.on) b{box-shadow:inset 0 0 0 2px var(--primary);color:var(--primary);font-weight:600}
 .cal-d.future{color:var(--disabled)}
 
@@ -277,11 +357,11 @@ button.cal-d:active b{background:var(--primary-press)}
 .st-h span:last-child{text-align:center}
 .setw{position:relative;overflow:hidden}
 .setw .del{position:absolute;right:0;top:0;bottom:0;width:88px;border:0;background:var(--error);color:var(--on-error);font:600 15px/20px var(--font)}
-.set{position:relative;touch-action:pan-y;background:var(--surface);padding:var(--s1) var(--s4);transition:transform .22s cubic-bezier(.32,.72,0,1)}
+.set{position:relative;touch-action:pan-y;background:var(--surface);padding:var(--s1) var(--s4);transition:transform .3s cubic-bezier(.32,.72,0,1)}
 .set.open{transform:translateX(-88px)}
 .idx{font:400 15px/20px var(--font);font-variant-numeric:tabular-nums;color:var(--text-3);text-align:center}
 .idx.pr{color:var(--warning);font-weight:600;font-size:13px}
-.nf{display:flex;align-items:center;height:44px;border-radius:var(--r-sm);background:var(--fill);min-width:0}
+.nf{display:flex;align-items:center;height:44px;border-radius:var(--r-sm);background:var(--fill);min-width:0;transition:background-color .15s,box-shadow .15s}
 .nf:focus-within{background:var(--surface);box-shadow:inset 0 0 0 2px var(--primary)}
 .nf input{flex:1;min-width:0;height:44px;border:0;background:none;padding:0 0 0 var(--s3);font:600 20px/26px var(--font);font-variant-numeric:tabular-nums}
 .nf input:focus{outline:none}
@@ -289,10 +369,10 @@ button.cal-d:active b{background:var(--primary-press)}
 .unit{flex:none;height:44px;min-width:40px;border:0;background:none;padding:0 var(--s2) 0 var(--s1);font:500 15px/20px var(--font);color:var(--text-3);text-decoration:underline dotted;text-underline-offset:4px;text-decoration-color:var(--border)}
 .unit.lb{color:var(--text)}
 .chk{width:44px;height:44px;border:0;background:none;display:grid;place-items:center;padding:0}
-.chk span{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);display:grid;place-items:center;color:var(--on-primary);transition:background-color .15s,border-color .15s,transform .15s}
+.chk span{width:30px;height:30px;border-radius:50%;border:2px solid var(--border);display:grid;place-items:center;color:var(--on-primary);transition:background-color .15s,border-color .15s,transform .35s cubic-bezier(.3,1.6,.5,1)}
 .chk svg{width:16px;height:16px}
-.set.done .chk span{background:var(--primary);border-color:var(--primary)}
-.chk:active span{transform:scale(.9)}
+.set.done .chk span{background:linear-gradient(180deg,var(--primary-hi),var(--primary));border-color:var(--primary);box-shadow:inset 0 1px 0 var(--btn-hl)}
+.chk:active span{transform:scale(.85)}
 .eff{grid-column:2/4;display:flex;align-items:center;justify-content:space-between;gap:var(--s2);min-height:28px;margin-top:-2px}
 .eff button{border:0;background:none;color:var(--primary);font:500 13px/18px var(--font);min-height:28px;padding:0 var(--s1)}
 .exs-f{padding:var(--s1) var(--s2) var(--s2)}
@@ -314,14 +394,17 @@ button.cal-d:active b{background:var(--primary-press)}
 </style>
 </head>
 <body>
+<div class="ambient" aria-hidden="true"></div>
 <main class="page" id="app" aria-busy="true">
   <div class="ph"><div class="ph-row"><div class="sk" style="width:96px;height:34px"></div></div></div>
   <div class="sk" style="height:56px;margin-bottom:16px"></div>
-  <div class="sk" style="height:220px;border-radius:14px"></div>
+  <div class="sk" style="height:220px;border-radius:var(--r-md)"></div>
 </main>
 <div class="dock" id="dock" hidden></div>
-<nav class="tabs" aria-label="主要導覽"><div class="tabs-in" id="tabs"></div></nav>
-<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="edge edge-top" aria-hidden="true"></div>
+<div class="edge edge-bottom" aria-hidden="true"></div>
+<nav class="tabs glass" aria-label="主要導覽"><div class="tabs-in" id="tabs"></div></nav>
+<div class="toast glass" id="toast" role="status" aria-live="polite"></div>
 <div class="dlg" id="dlg"></div>
 <div class="scrim" id="scrim" data-act="close"></div>
 <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle"></div>
@@ -549,15 +632,21 @@ const app=$('#app');
 const charts={};
 function render(){
   Object.values(charts).forEach(c=>c.destroy());for(const k in charts)delete charts[k];
-  $('#tabs').innerHTML=[['train','訓練',IC.tTrain],['prog','進度',IC.tProg],['body','身體',IC.tBody]]
-    .map(([k,l,ic])=>`<button data-tab="${k}" ${ui.tab===k?'aria-current="page"':''}>${ic}${l}</button>`).join('');
+  renderTabs();
   app.removeAttribute('aria-busy');
   ui.tab==='train'?renderTrain():ui.tab==='prog'?renderProg():renderBody();
   updateDock();
 }
+const TABS=[['train','訓練',IC.tTrain],['prog','進度',IC.tProg],['body','身體',IC.tBody]];
+/* built once and then only updated, so the glass lens can slide to the selected tab */
+function renderTabs(){
+  const el=$('#tabs');
+  if(!el.firstChild)el.innerHTML=`<span class="tab-lens" aria-hidden="true"></span>${TABS.map(([k,l,ic])=>`<button data-tab="${k}">${ic}${l}</button>`).join('')}`;
+  TABS.forEach(([k],i)=>{const b=el.querySelector(`[data-tab="${k}"]`);if(ui.tab===k){b.setAttribute('aria-current','page');el.style.setProperty('--tab-i',i)}else b.removeAttribute('aria-current')});
+}
 const gearBtn=()=>`<button class="iconbtn" data-act="settings" aria-label="設定">${IC.gear}</button>`;
 function header(title,sub,actions=''){
-  return `<header class="ph"><div class="ph-row"><h1 class="t-h1">${title}</h1><div class="ph-act">${actions}${gearBtn()}</div></div>${sub?`<p class="ph-sub t-callout c2" id="sum">${sub}</p>`:''}</header>`;
+  return `<header class="ph"><div class="ph-row"><h1 class="t-display">${title}</h1><div class="ph-act glass">${actions}${gearBtn()}</div></div>${sub?`<p class="ph-sub t-callout c2" id="sum">${sub}</p>`:''}</header>`;
 }
 
 /* =========================================================
@@ -801,13 +890,13 @@ function openLib(){
    ========================================================= */
 const RT={on:false,done:false,end:0,dur:0,iv:null,ac:null,doneT:null,label:''};
 function dockHTML(){
-  if(RT.on)return `<div class="dock-in timer ${RT.done?'done':''}" role="timer" aria-label="組間休息"><div class="timer-bar" id="rtBar"></div>
+  if(RT.on)return `<div class="dock-in"><div class="timer glass ${RT.done?'done':''}" role="timer" aria-label="組間休息"><div class="timer-bar" id="rtBar"></div>
     <div class="timer-main"><b id="rtTime">0:00</b><span class="t-caption c2" id="rtLbl"></span></div>
-    <button class="btn btn-secondary" data-act="rt" data-n="-15" aria-label="減少 15 秒">−15</button>
-    <button class="btn btn-secondary" data-act="rt" data-n="15" aria-label="增加 15 秒">+15</button>
-    <button class="btn btn-secondary" data-act="rtstop">${RT.done?'關閉':'結束'}</button></div>`;
+    <button class="btn" data-act="rt" data-n="-15" aria-label="減少 15 秒">−15</button>
+    <button class="btn" data-act="rt" data-n="15" aria-label="增加 15 秒">+15</button>
+    <button class="btn" data-act="rtstop">${RT.done?'關閉':'結束'}</button></div></div>`;
   if(ui.tab!=='train')return '';
-  return `<div class="dock-in"><button class="btn btn-secondary" data-act="reststart" aria-label="開始組間休息">${IC.timer}${fmtSec(restFor(ui.lastEx))}</button>
+  return `<div class="dock-in"><button class="btn glass dock-rest" data-act="reststart" aria-label="開始組間休息">${IC.timer}${fmtSec(restFor(ui.lastEx))}</button>
     <button class="btn btn-primary grow" data-act="openadd">${IC.plus}新增動作</button></div>`;
 }
 function updateDock(){
@@ -846,7 +935,7 @@ function stopRest(){clearInterval(RT.iv);RT.iv=null;clearTimeout(RT.doneT);RT.on
 function baseOpts(){
   const t3=cssv('text-3'),div=cssv('divider'),font={family:cssv('font')||'system-ui',size:13};
   return {responsive:true,maintainAspectRatio:false,animation:false,interaction:{mode:'index',intersect:false},
-    plugins:{legend:{display:false},tooltip:{backgroundColor:cssv('text'),titleColor:cssv('bg'),bodyColor:cssv('bg'),padding:10,cornerRadius:10,displayColors:false,titleFont:{...font,weight:'600'},bodyFont:font}},
+    plugins:{legend:{display:false},tooltip:{backgroundColor:cssv('text'),titleColor:cssv('bg'),bodyColor:cssv('bg'),padding:10,cornerRadius:12,displayColors:false,titleFont:{...font,weight:'600'},bodyFont:font}},
     scales:{x:{ticks:{color:t3,maxRotation:0,autoSkipPadding:16,font},grid:{display:false},border:{display:false}},
             y:{ticks:{color:t3,maxTicksLimit:4,font},grid:{color:div,drawTicks:false},border:{display:false}}}};
 }
@@ -913,7 +1002,7 @@ function renderProgDetail(){
   const n=ui.prog, all=exHistory(n), h=all.filter(x=>inRange(x.date)), lt=loadType(n);
   const best=f=>all.reduce((a,b)=>f(b)>f(a)?b:a,all[0]);
   const a=all.length?best(x=>x.top):null,b=all.length?best(x=>x.e1rm):null,c=all.length?best(x=>x.vol):null;
-  app.innerHTML=`<header class="ph"><div class="ph-row"><button class="btn btn-plain back" data-act="progback">${IC.chevL}進度</button><div class="ph-act"><button class="btn btn-plain" data-act="editex" data-name="${esc(n)}">編輯</button></div></div>
+  app.innerHTML=`<header class="ph"><div class="ph-row"><button class="btn glass back" data-act="progback">${IC.chevL}進度</button><div class="ph-act glass"><button class="btn btn-plain" data-act="editex" data-name="${esc(n)}">編輯</button></div></div>
     <h1 class="t-h1" style="margin-top:4px">${esc(n)}</h1><p class="ph-sub t-callout c2">${esc(catOf(n))}　${LOADS.find(l=>l[0]===lt)[1]}${lt==='assist'?'　數字為實際負荷':lt==='double'?'　數字為單邊重量':''}</p></header>
   ${all.length?`<div class="group stats">
     <div><p class="t-label c2">最重一組</p><p class="t-h2 num">${showW(a.top)}<span class="t-callout c2"> ${U()}×${a.topReps}</span></p><p class="t-caption c3">${md(a.date)}</p></div>
