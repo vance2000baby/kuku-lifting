@@ -43,6 +43,7 @@
   --shadow-float:0 1px 2px rgba(20,20,18,.06),0 6px 20px rgba(20,20,18,.09);
   --shadow-overlay:0 -6px 28px rgba(20,20,18,.10);
   --shadow-thumb:0 1px 2px rgba(20,20,18,.10),0 2px 6px rgba(20,20,18,.05);
+  --shadow-edge:-6px 0 24px rgba(20,20,18,.12);   /* leading edge of a page being swiped away */
   /* spacing */
   --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:20px; --s6:24px; --s7:32px; --s8:40px;
   /* radius — by component type, not one size for everything */
@@ -87,6 +88,7 @@
     --shadow-float:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.35);
     --shadow-overlay:0 -6px 28px rgba(0,0,0,.4);
     --shadow-thumb:0 1px 2px rgba(0,0,0,.4);
+    --shadow-edge:-6px 0 24px rgba(0,0,0,.45);
     color-scheme:dark;
   }
 }
@@ -105,6 +107,7 @@
     --shadow-float:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.35);
     --shadow-overlay:0 -6px 28px rgba(0,0,0,.4);
     --shadow-thumb:0 1px 2px rgba(0,0,0,.4);
+    --shadow-edge:-6px 0 24px rgba(0,0,0,.45);
     color-scheme:dark;
 }
 /* Reduce Transparency, or no backdrop-filter: materials become solid (fallbacks outrank the dark blocks) */
@@ -384,6 +387,15 @@ button.cal-d:active b{background:var(--primary-press)}
 .exs-f .btn-plain{gap:var(--s1)}
 .exs-f svg{width:var(--icon-xs);height:var(--icon-xs)}
 .notice .btn-plain{min-height:36px;flex:none}
+
+/* 進度: exercises grouped by category */
+.cat-h{display:flex;align-items:baseline;gap:var(--s2);margin:0;padding:var(--s4) var(--s1) var(--s2);color:var(--text-2)}
+.sec-h+.cat-h{padding-top:var(--s1)}
+
+/* swipe back: the page follows the finger; a snapshot of the previous page sits underneath, dimmed until revealed */
+.swipe-under{position:fixed;inset:0;z-index:1;overflow:hidden;background:var(--bg);padding-top:env(safe-area-inset-top,0px);pointer-events:none;transform:translateX(-30%)}
+.swipe-under::after{content:"";position:absolute;inset:0;background:var(--scrim);opacity:calc((1 - var(--p,0)) * .6)}
+#app.swiping{position:relative;z-index:2;background:var(--bg);min-height:100dvh;box-shadow:var(--shadow-edge)}
 
 /* stats row */
 .stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
@@ -993,9 +1005,9 @@ function renderProg(){
       <p class="t-caption c2" style="margin-top:12px;display:flex;flex-wrap:wrap;gap:4px 16px">${used.map(c=>`<span style="display:inline-flex;align-items:center;gap:6px"><i style="width:8px;height:8px;border-radius:2px;background:${catColor(c)}"></i>${c}</span>`).join('')}</p>`
       :`<p class="t-callout c2">這段期間沒有訓練。</p>`}</div></section>
   <section class="sec"><div class="sec-h"><h2 class="t-h3">動作</h2><span class="t-caption c2">最近一次的最重組</span></div>
-    <div class="group">${names.map(n=>{const h=exHistory(n),l=h[h.length-1],p=h[h.length-2],dv=p?l.top-p.top:0;
-      return `<button class="row" data-act="progex" data-name="${esc(n)}"><div class="row-main"><p class="t-body">${esc(n)}</p><p class="t-caption c2">${esc(catOf(n))}　${md(l.date)}　${h.length} 次</p></div>
-        <div class="row-end"><p class="t-callout num">${showW(l.top)} ${U()}</p>${p&&Math.abs(dv)>.01?`<p class="t-caption num ${dv>0?'good':'c3'}">${dv>0?'+':'−'}${showW(Math.abs(dv))}</p>`:''}</div><span class="chev">${IC.chevR}</span></button>`}).join('')}</div></section>
+    ${groupByCat(names).map(([cat,ns])=>`<h3 class="cat-h t-label">${esc(cat)}<span class="c3 num">${ns.length}</span></h3><div class="group">${ns.map(n=>{const h=exHistory(n),l=h[h.length-1],p=h[h.length-2],dv=p?l.top-p.top:0;
+      return `<button class="row" data-act="progex" data-name="${esc(n)}"><div class="row-main"><p class="t-body">${esc(n)}</p><p class="t-caption c2">${md(l.date)}　${h.length} 次</p></div>
+        <div class="row-end"><p class="t-callout num">${showW(l.top)} ${U()}</p>${p&&Math.abs(dv)>.01?`<p class="t-caption num ${dv>0?'good':'c3'}">${dv>0?'+':'−'}${showW(Math.abs(dv))}</p>`:''}</div><span class="chev">${IC.chevR}</span></button>`}).join('')}</div>`).join('')}</section>
   <section class="sec"><div class="sec-h"><h2 class="t-h3">訓練紀錄</h2></div>
     <div class="group">${(dates.length?dates:sessionDates()).slice().reverse().slice(0,30).map(d=>{const s=S.sessions[d],st=sessionStats(s);
       return `<button class="row" data-act="openday" data-d="${d}"><div class="row-main"><p class="t-body">${mdLong(d)} 週${wd(d)}</p><p class="t-caption c2">${esc(s.items.filter(i=>i.sets.some(isDone)).map(i=>i.name).join('、'))}</p></div><p class="row-end t-callout c2 num">${volTxt(st.vol)}</p><span class="chev">${IC.chevR}</span></button>`}).join('')}</div></section>`;
@@ -1194,7 +1206,7 @@ function importFile(e){
    INTERACTION
    ========================================================= */
 $('#tabs').addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(!b)return;
-  if(ui.tab===b.dataset.tab&&b.dataset.tab==='prog')ui.prog=null;ui.tab=b.dataset.tab;render();window.scrollTo(0,0)});
+  if(ui.tab===b.dataset.tab&&b.dataset.tab==='prog'){ui.prog=null;backSnap=null}ui.tab=b.dataset.tab;render();window.scrollTo(0,0)});
 
 function closeSwipes(except){document.querySelectorAll('.set.open').forEach(s=>{if(s!==except)s.classList.remove('open')})}
 document.body.addEventListener('click',e=>{
@@ -1226,8 +1238,9 @@ document.body.addEventListener('click',e=>{
       ...(it.sets.length>1?[{label:'刪除最後一組',act:'dellast',data:{i}}]:[]),
       {label:'從今天移除',act:'rmex',data:{i},danger:true}]);break}
     case 'editex': openExEdit(b.dataset.name);break;
-    case 'progex': closeSheet();ui.tab='prog';ui.prog=b.dataset.name;render();window.scrollTo(0,0);break;
-    case 'progback': ui.prog=null;render();window.scrollTo(0,0);break;
+    case 'progex': if(ui.tab==='prog'&&!ui.prog)snapProg();else backSnap=null;
+      closeSheet();ui.tab='prog';ui.prog=b.dataset.name;render();window.scrollTo(0,0);break;
+    case 'progback': progBack();break;
     case 'rmex': removeExercise(i);break;
     case 'dellast': closeSheet();deleteSet(i,s.items[i].sets.length-1);break;
     case 'addset':{const it=s.items[i],last=it.sets[it.sets.length-1]||{};
@@ -1278,6 +1291,59 @@ app.addEventListener('touchmove',e=>{if(!sw)return;const t=e.touches[0],dx=t.cli
   if(sw.lock!=='x')return;e.preventDefault();sw.dx=dx;sw.r.style.transition='none';sw.r.style.transform=`translateX(${Math.min(0,Math.max(-112,sw.base+dx))}px)`},{passive:false});
 app.addEventListener('touchend',()=>{if(!sw)return;const r=sw.r;r.style.transition='';r.style.transform='';
   if(sw.lock==='x')r.classList.toggle('open',sw.base+sw.dx<-44);sw=null});
+/* ---- 進度 → 動作詳細: back returns to the same scroll position; swipe right to go back ----
+   The list is snapshotted when you open an exercise (charts as images), so the swipe can reveal it underneath. */
+let backSnap=null;
+function snapProg(){
+  const c=app.cloneNode(true);
+  c.querySelectorAll('canvas').forEach(cv=>{const ch=charts[cv.id];if(!ch)return;
+    const img=document.createElement('img');img.src=ch.toBase64Image();img.alt='';img.style.cssText='display:block;width:100%;height:100%';cv.replaceWith(img)});
+  c.querySelectorAll('[id]').forEach(el=>el.removeAttribute('id'));
+  backSnap={html:c.innerHTML,y:window.scrollY};
+}
+function progBack(){
+  const y=backSnap?.y||0;backSnap=null;
+  ui.prog=null;render();window.scrollTo(0,y);
+}
+let bk=null;
+const backable=()=>ui.tab==='prog'&&ui.prog&&!$('#sheet').classList.contains('open')&&!$('#dlg').classList.contains('open');
+document.addEventListener('touchstart',e=>{
+  if(bk||!backable()||e.touches.length>1||!app.contains(e.target))return;
+  const t=e.touches[0];
+  if(e.target.closest('canvas')&&t.clientX>32)return;   /* charts keep their own drag (tooltips) unless you start at the edge */
+  bk={x0:t.clientX,y0:t.clientY,dx:0,lock:null,lx:t.clientX,lt:e.timeStamp,v:0};
+},{passive:true});
+document.addEventListener('touchmove',e=>{
+  if(!bk)return;const t=e.touches[0],dx=t.clientX-bk.x0,dy=t.clientY-bk.y0;
+  if(bk.lock==null){
+    if(Math.abs(dx)<10&&Math.abs(dy)<10)return;
+    bk.lock=dx>0&&Math.abs(dx)>Math.abs(dy)*1.2?'x':'y';
+    if(bk.lock!=='x'){bk=null;return}
+    const u=document.createElement('div');u.className='swipe-under';u.setAttribute('aria-hidden','true');
+    u.innerHTML=`<div class="page" style="transform:translateY(${-(backSnap?.y||0)}px)">${backSnap?.html||''}</div>`;
+    document.body.appendChild(u);app.classList.add('swiping');bk.u=u;bk.w=window.innerWidth;
+  }
+  e.preventDefault();
+  if(e.timeStamp>bk.lt)bk.v=(t.clientX-bk.lx)/(e.timeStamp-bk.lt);bk.lx=t.clientX;bk.lt=e.timeStamp;
+  bk.dx=Math.max(0,dx);const p=Math.min(1,bk.dx/bk.w);
+  app.style.transform=`translateX(${bk.dx}px)`;
+  bk.u.style.transform=`translateX(${(p-1)*30}%)`;bk.u.style.setProperty('--p',p);
+},{passive:false});
+function endBack(e){
+  if(!bk)return;const s=bk;bk=null;if(s.lock!=='x')return;
+  if(e&&e.timeStamp-s.lt>80)s.v=0;   /* finger paused before lifting: not a flick */
+  const go=s.dx>s.w*.33||(s.v>.35&&s.dx>24);
+  const ease='transform var(--dur-3) var(--ease-sheet)';
+  app.style.transition=s.u.style.transition=ease;
+  app.style.transform=go?`translateX(${s.w}px)`:'';
+  s.u.style.transform=go?'translateX(0)':'translateX(-30%)';s.u.style.setProperty('--p',go?1:0);
+  setTimeout(()=>{
+    if(go)progBack();              /* the list renders at the snapshot's position, so the swap is seamless */
+    app.style.transition='none';app.style.transform='';app.classList.remove('swiping');s.u.remove();
+    requestAnimationFrame(()=>{app.style.transition=''});
+  },380);
+}
+document.addEventListener('touchend',endBack);document.addEventListener('touchcancel',endBack);
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){if($('#dlg').classList.contains('open'))return;closeSheet()}});
 matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change',()=>render());
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&RT.on&&!RT.done)tickRest()});
