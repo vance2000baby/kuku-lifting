@@ -95,9 +95,10 @@ S = {
   - 有輸入時是搜尋模式：`matchName()` 以空白分詞、每個詞都要出現、忽略大小寫與空白。符合的動作排最前面，「建立新動作」是最下面的一行，按了才展開建立表單（`ui.creating`），部位會預設為目前篩選的部位。
   - 注音／拼音選字中（`isComposing`）不重新搜尋，等 `compositionend`。
   - Enter：名稱完全相同就加入；只有一個符合就加入那個；建立表單已展開且選了部位就建立；否則收起鍵盤。
-  - 用 `openSheet(…, {tall:true})`：面板頂端固定、底部貼著鍵盤，搜尋列包在 `.sheet-sticky` 裡，捲動列表時不會被捲走。輸入或切換部位時 `suggTop()` 把列表捲回頂端。
+  - 用 `openSheet(…, {tall:true, head})`：搜尋框放在標題列（`opts.head` 取代標題，標題留給讀屏），面板頂端固定在狀態列下方。拖動結果列表會收起鍵盤（像 iOS 內建搜尋）。輸入或切換部位時 `suggTop()` 把列表捲回頂端。
+  - 搜尋框用 `type="search"`、提示文字不要出現「名稱」：iOS 會把疑似姓名欄位加上「自動填寫聯絡人」。鍵盤上方的 ︿﹀✓ 工具列是 iOS 自己的，網頁無法移除。
 - **動作庫**（`openLib()`）同樣按部位分組。
-- **Sheet 與 iOS 鍵盤**：iOS 開鍵盤時不會縮小 layout viewport，只會縮小 `visualViewport`，所以 `trackKeyboard()` 把鍵盤高度、可見高度、可見區頂端寫成 `--kb`、`--vvh`、`--vvtop`。所有 sheet 的 `bottom` 都是 `--kb`（停在鍵盤上方）；`.sheet.tall` 的頂端固定在可見區頂端往下 10vh，內容變多變少、鍵盤開合時頂端都不會動。內容會隨輸入變化的 sheet 都要用 `tall`。
+- **Sheet 與 iOS 鍵盤**：iOS 開鍵盤時不會縮小 layout viewport，只會縮小 `visualViewport`，所以 `trackKeyboard()` 把鍵盤高度、可見高度、可見區頂端寫成 `--kb`、`--vvh`、`--vvtop`。iOS 鍵盤是半透明的，所以 sheet 一律延伸到螢幕底部（底色在鍵盤後面透出來），用 `padding-bottom: max(safe-b, --kb)` 把內容推到鍵盤上方；不要把 sheet 的 `bottom` 設成 `--kb`，鍵盤後面會透出底下的頁面，看起來像被截斷。`.sheet.tall` 頂端固定在狀態列下方，內容變多變少、鍵盤開合時都不會動；內容會隨輸入變化的 sheet 都要用 `tall`。
 - **訓練月曆**：週一開頭（與 `weekKey()` 一致），有已完成組的日子（`sessionDates()`）填滿主色，點一下跳到那天的訓練頁；今天以外框標示。月份存在 `ui.calMonth`（`'YYYY-MM'`），不受時間範圍影響；最早只能往前翻到第一次訓練的月份，最晚到本月。
 
 ## 領域規則（改動時務必維持）

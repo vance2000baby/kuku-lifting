@@ -199,12 +199,15 @@ select.field{appearance:none;-webkit-appearance:none;background-image:linear-gra
 /* Bottom sheet */
 .scrim{position:fixed;inset:0;z-index:20;background:var(--scrim);opacity:0;pointer-events:none;transition:opacity .2s}
 .scrim.open{opacity:1;pointer-events:auto}
-/* --kb / --vvh come from visualViewport (see trackKeyboard): the iOS keyboard overlays the page, so sheets sit on top of it */
-.sheet{position:fixed;left:0;right:0;bottom:var(--kb,0px);z-index:21;max-width:var(--page-max);margin:0 auto;max-height:calc(var(--vvh,100vh) * .9);display:flex;flex-direction:column;background:var(--bg);border-radius:var(--r-lg) var(--r-lg) 0 0;box-shadow:var(--e1);transform:translateY(105%);transition:transform .32s cubic-bezier(.32,.72,0,1);padding-bottom:max(0px,calc(var(--safe-b) - var(--kb,0px)))}
-/* top pinned 10vh below the visible top, bottom on the keyboard: the search field never moves while results change or the keyboard opens */
-.sheet.tall{top:calc(var(--vvtop,0px) + 10vh);max-height:none}
+/* --kb / --vvh / --vvtop come from visualViewport (see trackKeyboard). The iOS keyboard is translucent and overlays the page,
+   so sheets keep reaching the screen bottom (their background shows behind the keyboard) and pad their content up above it */
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;max-width:var(--page-max);margin:0 auto;max-height:calc(var(--vvh,100vh) * .9 + var(--kb,0px));display:flex;flex-direction:column;background:var(--bg);border-radius:var(--r-lg) var(--r-lg) 0 0;box-shadow:var(--e1);transform:translateY(105%);transition:transform .32s cubic-bezier(.32,.72,0,1);padding-bottom:max(var(--safe-b),var(--kb,0px))}
+/* top pinned just below the status bar: the header never moves while results change or the keyboard opens */
+.sheet.tall{top:calc(var(--vvtop,0px) + env(safe-area-inset-top,0px) + var(--s3));max-height:none}
 .sheet.tall .sheet-b{flex:1}
-.sheet-sticky{position:sticky;top:calc(var(--s2) * -1);z-index:1;background:var(--bg);margin:calc(var(--s2) * -1) calc(var(--s4) * -1) 0;padding:var(--s2) var(--s4)}
+.sheet-search{flex:1;min-width:0;margin-right:var(--s1)}
+.sheet-search input{-webkit-appearance:none;appearance:none}
+#sugg>:first-child{margin-top:var(--s2)!important}
 .sheet:not(.open){visibility:hidden;transition:transform .32s cubic-bezier(.32,.72,0,1),visibility 0s .32s}
 .sheet.open{transform:none}
 .sheet-top{flex:none;padding-top:var(--s2);touch-action:none}
@@ -513,12 +516,13 @@ function trackKeyboard(){
   vv.addEventListener('resize',set);vv.addEventListener('scroll',set);set();
 }
 trackKeyboard();
-/* opts.tall: fixed height, for sheets whose content changes while typing */
+/* opts.tall: top pinned under the status bar, for sheets whose content changes while typing */
+/* opts.head: html shown in the header instead of the title (the title stays for screen readers) */
 function openSheet(title,html,after,opts){
   const sh=$('#sheet');
   sheetPrevFocus=document.activeElement;
   sh.classList.toggle('tall',!!opts?.tall);
-  sh.innerHTML=`<div class="sheet-top"><div class="grab"></div><div class="sheet-h"><h2 class="t-h3" id="sheetTitle">${title}</h2><button class="iconbtn" data-act="close" aria-label="關閉">${IC.x}</button></div></div><div class="sheet-b">${html}</div>`;
+  sh.innerHTML=`<div class="sheet-top"><div class="grab"></div><div class="sheet-h">${opts?.head?`<h2 class="vh" id="sheetTitle">${title}</h2>${opts.head}`:`<h2 class="t-h3" id="sheetTitle">${title}</h2>`}<button class="iconbtn" data-act="close" aria-label="關閉">${IC.x}</button></div></div><div class="sheet-b">${html}</div>`;
   $('#scrim').classList.add('open');sh.classList.add('open');document.body.style.overflow='hidden';
   bindSheetDrag(sh);
   after&&after(sh);
@@ -530,7 +534,7 @@ function closeSheet(){
 }
 function bindSheetDrag(sh){
   const top=sh.querySelector('.sheet-top');let y0=null,dy=0;
-  top.addEventListener('touchstart',e=>{if(e.target.closest('button'))return;y0=e.touches[0].clientY;dy=0;sh.style.transition='none'},{passive:true});
+  top.addEventListener('touchstart',e=>{if(e.target.closest('button,input,label'))return;y0=e.touches[0].clientY;dy=0;sh.style.transition='none'},{passive:true});
   top.addEventListener('touchmove',e=>{if(y0==null)return;dy=Math.max(0,e.touches[0].clientY-y0);sh.style.transform=`translateY(${dy}px)`},{passive:true});
   top.addEventListener('touchend',()=>{if(y0==null)return;sh.style.transition='';sh.style.transform='';if(dy>90)closeSheet();y0=null});
 }
@@ -681,10 +685,12 @@ function addSearch(){
 }
 function openAdd(){
   ui.newCat=null;ui.newUnit=U();ui.newLoad='single';ui.addCat=null;ui.creating=false;
-  openSheet('新增動作',`
-    <div class="sheet-sticky"><label class="unitfield" style="padding-left:12px">${'<span style="width:20px;height:20px;color:var(--text-3)">'+IC.search+'</span>'}<input id="q" placeholder="搜尋動作，或輸入新名稱" autocomplete="off" enterkeyhint="search" style="font:400 17px/24px var(--font)"></label></div>
-    <div id="sugg"></div>`,()=>{
+  /* type=search and no "名稱" wording: iOS otherwise guesses a name field and offers 自動填寫聯絡人 */
+  const head=`<label class="unitfield sheet-search" style="padding-left:12px"><span style="width:20px;height:20px;color:var(--text-3)">${IC.search}</span><input id="q" type="search" name="exercise-search" placeholder="搜尋或新增動作" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" aria-label="搜尋或新增動作" style="font:400 17px/24px var(--font)"></label>`;
+  openSheet('新增動作',`<div id="sugg"></div>`,sh=>{
       const q=$('#q');
+      /* like iOS search: dragging the results hides the keyboard so the whole list is reachable */
+      sh.querySelector('.sheet-b').addEventListener('touchmove',()=>{if(document.activeElement===q)q.blur()},{passive:true});
       /* skip IME composition (注音 still being picked) so half-typed text doesn't flash "建立「ㄒㄧㄚ」" */
       q.addEventListener('input',e=>{if(e.isComposing)return;ui.creating=false;drawSugg();suggTop()});
       q.addEventListener('compositionend',()=>{ui.creating=false;drawSugg();suggTop()});
@@ -696,7 +702,7 @@ function openAdd(){
         else q.blur();
       });
       drawSugg();
-    },{tall:true});
+    },{tall:true,head});
 }
 /* new results start at the top of the list (not on create-form taps, which redraw in place) */
 const suggTop=()=>{const b=$('#sheet .sheet-b');if(b)b.scrollTop=0};
