@@ -1,6 +1,6 @@
 /* 別肌動 service worker — app shell, cache-first.
    每次部署有改到任何檔案，都要遞增 VERSION，否則使用者會一直拿到舊的快取。 */
-const VERSION = 'v7';
+const VERSION = 'v8';
 const CACHE = `kuku-${VERSION}`;
 const SHELL = [
   './',

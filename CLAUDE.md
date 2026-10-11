@@ -120,20 +120,22 @@ S = {
 
 - **Token** 都定義在 `:root`，並有 dark mode 版本（`prefers-color-scheme` 以及 `data-theme`，兩個 dark 區塊要同步修改）。
   - 顏色只能用 semantic token：`--bg --surface --elevated --fill --fill-2 --text --text-2 --text-3 --border --divider --primary --primary-hi --on-primary --primary-soft --success --warning --error --disabled`。部位色 `--cat-*` 只用在圖表。
-  - 玻璃：`--glass`（bar、按鈕）、`--glass-thick`（sheet、對話框）、`--glass-cell`（sheet 裡的 `.group`）、`--glass-rim / --glass-rim-2`（上緣高光與內框）、`--glass-edge`（外圍細線）、`--glass-sheen`、`--glass-shadow`、`--glass-blur / --glass-blur-thick`、`--lens`（玻璃上的選取／按壓底色）。
+  - 玻璃：`--glass`（bar、按鈕，幾乎透明）、`--glass-thick`（sheet、對話框、toast，承載文字所以稍厚）、`--glass-cell`（sheet 裡的 `.group`）、`--glass-rim / --glass-rim-2`（左上高光、右下反光與內框）、`--glass-glow`（鏡片邊緣內光）、`--glass-edge`（外圍細線）、`--glass-sheen`、`--glass-shadow`、`--glass-blur / --glass-blur-thick`、`--glass-halo`（透明玻璃上文字的光暈）、`--tint`（有色玻璃）、`--lens`（玻璃上的選取／按壓底色）。
   - 其他：`--thumb / --thumb-shadow`（segmented 與 toggle 的滑塊）、`--btn-hl`（實心按鈕上緣高光）、`--amb-1..3`（背景環境光）。
-- **材質 `.glass`**：半透明背景＋`backdrop-filter`（模糊＋飽和）＋上緣高光＋內框＋多層柔和陰影＋`::before` 光澤（`isolation:isolate` 讓光澤在子元素下面）。目前用在：tab bar、header 的工具列膠囊（`.ph-act`）、返回鍵、dock 的休息按鈕與計時器、toast。Sheet 與對話框用同樣配方的 thick 版本（寫在各自的 CSS）。
+- **材質 `.glass`**：接近透明的 clear glass——輕度模糊（6px）＋高飽和，質感來自邊緣光：左上高光、右下反光、內框、內光暈、柔和陰影，加上 `::before` 斜向光澤（`isolation:isolate` 讓光澤在子元素下面）。目前用在：tab bar、header 的工具列膠囊（`.ph-act`）、返回鍵、dock 的休息按鈕與計時器、toast（toast 加厚）。`.glass-tint` 是有色玻璃（Apple 的 prominent glass），用在 dock 的「新增動作」。Sheet 與對話框用 thick 配方（寫在各自的 CSS）。
+  - 不要在玻璃後面再疊模糊層：底部原本的捲動邊緣模糊會讓 tab bar 後面什麼都看不到，已移除，只保留狀態列下的 `.edge-top`。
   - **不要**把 `.glass` 加到卡片、列表、圖表等內容上。
   - 玻璃上不要用實心的 `--divider`、`--fill`：分隔線用 `color-mix(var(--text) 9%)`，按鈕底色用 `--lens`。
   - 降低透明度（`prefers-reduced-transparency`）或不支援 `backdrop-filter` 時，玻璃 token 會換成實心色；提高對比（`prefers-contrast: more`）時外框加深。這些 fallback 用 `:root:root:root` 提高權重，才能蓋過 dark 區塊。
-- **版面層次**（由下到上）：`.ambient` 環境光 → 內容 → `.edge-top / .edge-bottom`（捲動邊緣模糊）→ dock → tab bar → scrim → sheet → toast → 對話框。
+- **版面層次**（由下到上）：`.ambient` 環境光 → 內容 → `.edge-top`（狀態列下的捲動邊緣模糊）→ dock → tab bar → scrim → sheet → toast → 對話框。
   - Tab bar 是浮動膠囊（`--tab-h`、`--tab-b`），`renderTabs()` 只建一次，之後只更新 `aria-current` 和 `--tab-i`，讓 `.tab-lens` 滑過去。
-  - Dock 浮在 tab bar 上方（`--dock-b`、`--dock-h`）；頁面底部留白、toast、`.edge-bottom` 都依這些變數計算。
+  - Dock 浮在 tab bar 上方（`--dock-b`、`--dock-h`）；頁面底部留白、toast 都依這些變數計算。
 - **字級**：使用 `.t-display / .t-h1 / .t-h2 / .t-h3 / .t-body / .t-callout / .t-caption / .t-label`，最小 13px（tab bar 標籤 12px 是唯一例外）。三個主頁的標題用 `.t-display`（iOS 大標題）。數字加 `.num`（tabular-nums）。字體一律用系統字體。
 - **間距**：`--s1` 到 `--s8`（4、8、12、16、20、24、32、40）。
 - **圓角**（同心：sheet 36 − 內距 16 = 卡片 20）：`--r-sm` 12（輸入框）、`--r-md` 20（卡片、`.group`）、`--r-lg` 28（對話框）、`--r-xl` 36（sheet）、`--r-full` 給圓形與膠囊（按鈕、segmented、chips、tab bar、toast）。
 - **動態**：按壓回饋用 `transform: scale()` 搭配有回彈的 `cubic-bezier(.3,1.5,.5,1)`；`prefers-reduced-motion` 時全部關閉。
 - **元件**：`.btn`（primary／secondary／plain／destructive／danger，`.btn.glass` 是玻璃按鈕）、`.group` + `.row`（列表）、`.seg`（segmented control）、`.choices`、`.field`、`.unitfield`、`.toggle`、`openSheet()` / `actionSheet()`、`toast()`、`askConfirm()`、`.empty`。新畫面請重用這些元件。
+- **表單**：兩欄的 grid 一律用 `repeat(2,minmax(0,1fr))`，否則輸入框的預設寬度會把右欄擠出手機畫面。日期輸入框都加 `required`（iOS 日期選擇器才不會出現「重置」），清空時會自動還原成原本的日期。
 - **觸控**：觸控目標至少 44px。頁面只能垂直捲動：`html` 設定 `touch-action: manipulation` 和 `overflow-x: clip`，`.set` 設定 `touch-action: pan-y`，左滑刪除由 JS 處理。
 
 ## PWA 任務清單

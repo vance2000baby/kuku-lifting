@@ -31,16 +31,19 @@
   --cat-legs:#C8553D; --cat-back:#3D6CA8; --cat-chest:#C29129; --cat-shoulder:#2E8559;
   --cat-arms:#8467AE; --cat-core:#7B7974; --cat-other:#B4B2AC;
   /* Liquid Glass — floating control layer only (tab bar, toolbars, dock, sheets, dialogs, toasts) */
-  --glass:rgba(255,255,255,.56);           /* bars, buttons */
-  --glass-thick:rgba(249,248,245,.82);     /* sheets, dialogs: carry content, so less see-through */
-  --glass-cell:rgba(255,255,255,.74);      /* grouped rows inside a glass sheet */
-  --glass-rim:rgba(255,255,255,.9);        /* specular top edge */
-  --glass-rim-2:rgba(255,255,255,.4);      /* inner stroke + lower edge */
-  --glass-edge:rgba(20,20,18,.07);         /* hairline that separates glass from light content */
-  --glass-sheen:linear-gradient(180deg,rgba(255,255,255,.5),rgba(255,255,255,0) 52%);
-  --glass-shadow:0 1px 1px rgba(20,20,18,.04),0 6px 18px rgba(20,20,18,.09),0 18px 44px rgba(20,20,18,.08);
-  --glass-blur:blur(22px) saturate(190%);
-  --glass-blur-thick:blur(40px) saturate(180%);
+  --glass:rgba(255,255,255,.16);           /* bars, buttons: nearly clear, the edges do the work */
+  --glass-thick:rgba(250,249,246,.58);     /* sheets, dialogs: carry content, so a little thicker */
+  --glass-cell:rgba(255,255,255,.62);      /* grouped rows inside a glass sheet */
+  --glass-rim:rgba(255,255,255,.95);       /* specular highlight, top-left */
+  --glass-rim-2:rgba(255,255,255,.5);      /* reflected light, bottom-right + inner stroke */
+  --glass-glow:rgba(255,255,255,.22);      /* light caught inside the lens rim */
+  --glass-edge:rgba(20,20,18,.09);         /* hairline that separates glass from light content */
+  --glass-sheen:linear-gradient(135deg,rgba(255,255,255,.42) 0%,rgba(255,255,255,.06) 34%,rgba(255,255,255,0) 58%,rgba(255,255,255,.14) 100%);
+  --glass-shadow:0 2px 6px rgba(20,20,18,.06),0 10px 28px rgba(20,20,18,.10);
+  --glass-blur:blur(6px) saturate(200%) brightness(1.02);
+  --glass-blur-thick:blur(26px) saturate(180%) brightness(1.04);
+  --glass-halo:0 0 10px rgba(255,255,255,.75); /* keeps text legible on clear glass */
+  --tint:color-mix(in srgb,var(--primary) 74%,transparent); /* prominent (tinted) glass */
   --lens:rgba(20,20,18,.065);              /* selected tab / pressed state on glass */
   --thumb:#FFFFFF;                         /* segmented-control thumb */
   --thumb-shadow:0 1px 2px rgba(20,20,18,.08),0 3px 10px rgba(20,20,18,.08);
@@ -69,10 +72,13 @@
     --success:#6CC79A; --warning:#E2A647; --warning-soft:#392D17; --error:#EF7A66; --on-error:#1C0D0A;
     --disabled:#55534F; --scrim:rgba(0,0,0,.45);
     --cat-legs:#E07A63; --cat-back:#6E98D3; --cat-chest:#DDB04E; --cat-shoulder:#5DB585; --cat-arms:#A88BD1; --cat-core:#9A9893; --cat-other:#5E5C58;
-    --glass:rgba(46,46,43,.52); --glass-thick:rgba(30,30,28,.8); --glass-cell:rgba(255,255,255,.06);
-    --glass-rim:rgba(255,255,255,.2); --glass-rim-2:rgba(255,255,255,.07); --glass-edge:rgba(0,0,0,.45);
-    --glass-sheen:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,0) 52%);
-    --glass-shadow:0 1px 1px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.42),0 20px 52px rgba(0,0,0,.34);
+    --glass:rgba(24,24,22,.22); --glass-thick:rgba(26,26,24,.6); --glass-cell:rgba(255,255,255,.07);
+    --glass-rim:rgba(255,255,255,.42); --glass-rim-2:rgba(255,255,255,.14); --glass-glow:rgba(255,255,255,.06); --glass-edge:rgba(0,0,0,.5);
+    --glass-sheen:linear-gradient(135deg,rgba(255,255,255,.16) 0%,rgba(255,255,255,.03) 34%,rgba(255,255,255,0) 58%,rgba(255,255,255,.07) 100%);
+    --glass-shadow:0 2px 6px rgba(0,0,0,.3),0 12px 32px rgba(0,0,0,.4);
+    --glass-blur:blur(6px) saturate(180%) brightness(.92);
+    --glass-halo:0 0 10px rgba(0,0,0,.6);
+    --tint:color-mix(in srgb,var(--primary) 70%,transparent);
     --lens:rgba(255,255,255,.1); --thumb:#55554F; --thumb-shadow:0 1px 2px rgba(0,0,0,.35),0 3px 10px rgba(0,0,0,.3);
     --btn-hl:rgba(255,255,255,.22);
     --amb-1:rgba(98,192,149,.13); --amb-2:rgba(221,176,78,.06); --amb-3:rgba(110,152,211,.08);
@@ -86,10 +92,13 @@
     --success:#6CC79A; --warning:#E2A647; --warning-soft:#392D17; --error:#EF7A66; --on-error:#1C0D0A;
     --disabled:#55534F; --scrim:rgba(0,0,0,.45);
     --cat-legs:#E07A63; --cat-back:#6E98D3; --cat-chest:#DDB04E; --cat-shoulder:#5DB585; --cat-arms:#A88BD1; --cat-core:#9A9893; --cat-other:#5E5C58;
-    --glass:rgba(46,46,43,.52); --glass-thick:rgba(30,30,28,.8); --glass-cell:rgba(255,255,255,.06);
-    --glass-rim:rgba(255,255,255,.2); --glass-rim-2:rgba(255,255,255,.07); --glass-edge:rgba(0,0,0,.45);
-    --glass-sheen:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,0) 52%);
-    --glass-shadow:0 1px 1px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.42),0 20px 52px rgba(0,0,0,.34);
+    --glass:rgba(24,24,22,.22); --glass-thick:rgba(26,26,24,.6); --glass-cell:rgba(255,255,255,.07);
+    --glass-rim:rgba(255,255,255,.42); --glass-rim-2:rgba(255,255,255,.14); --glass-glow:rgba(255,255,255,.06); --glass-edge:rgba(0,0,0,.5);
+    --glass-sheen:linear-gradient(135deg,rgba(255,255,255,.16) 0%,rgba(255,255,255,.03) 34%,rgba(255,255,255,0) 58%,rgba(255,255,255,.07) 100%);
+    --glass-shadow:0 2px 6px rgba(0,0,0,.3),0 12px 32px rgba(0,0,0,.4);
+    --glass-blur:blur(6px) saturate(180%) brightness(.92);
+    --glass-halo:0 0 10px rgba(0,0,0,.6);
+    --tint:color-mix(in srgb,var(--primary) 70%,transparent);
     --lens:rgba(255,255,255,.1); --thumb:#55554F; --thumb-shadow:0 1px 2px rgba(0,0,0,.35),0 3px 10px rgba(0,0,0,.3);
     --btn-hl:rgba(255,255,255,.22);
     --amb-1:rgba(98,192,149,.13); --amb-2:rgba(221,176,78,.06); --amb-3:rgba(110,152,211,.08);
@@ -97,10 +106,10 @@
 }
 /* Reduce Transparency, or no backdrop-filter: glass becomes solid */
 @media (prefers-reduced-transparency: reduce){
-  :root:root:root{--glass:var(--elevated);--glass-thick:var(--bg);--glass-cell:var(--surface)}
+  :root:root:root{--glass:var(--elevated);--glass-thick:var(--bg);--glass-cell:var(--surface);--tint:var(--primary);--glass-halo:none}
 }
 @supports not ((-webkit-backdrop-filter:blur(1px)) or (backdrop-filter:blur(1px))){
-  :root:root:root{--glass:var(--elevated);--glass-thick:var(--bg);--glass-cell:var(--surface)}
+  :root:root:root{--glass:var(--elevated);--glass-thick:var(--bg);--glass-cell:var(--surface);--tint:var(--primary);--glass-halo:none}
 }
 @media (prefers-contrast: more){
   :root:root:root{--glass-edge:var(--border);--glass-thick:var(--bg)}
@@ -137,11 +146,9 @@ svg{display:block}
 /* ambient light behind everything, so the glass layer has something to pick up */
 .ambient{position:fixed;inset:0;z-index:-1;pointer-events:none;
   background:radial-gradient(120% 55% at 0% 0%,var(--amb-1),transparent 62%),radial-gradient(90% 45% at 100% 4%,var(--amb-2),transparent 60%),radial-gradient(80% 50% at 50% 100%,var(--amb-3),transparent 70%)}
-/* scroll edge effects: content softens as it passes under the status bar and the floating bars */
+/* scroll edge effect: content softens as it passes under the status bar (none at the bottom: the clear tab bar should show what's behind it) */
 .edge{position:fixed;left:0;right:0;z-index:8;pointer-events:none;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 .edge-top{top:0;height:calc(env(safe-area-inset-top,0px) + var(--s4));background:linear-gradient(color-mix(in srgb,var(--bg) 72%,transparent),transparent);-webkit-mask-image:linear-gradient(#000 45%,transparent);mask-image:linear-gradient(#000 45%,transparent)}
-.edge-bottom{bottom:0;height:calc(var(--tab-b) + var(--tab-h) + var(--s7));background:linear-gradient(transparent,color-mix(in srgb,var(--bg) 60%,transparent));-webkit-mask-image:linear-gradient(transparent,#000 55%);mask-image:linear-gradient(transparent,#000 55%)}
-body.has-dock .edge-bottom{height:calc(var(--dock-b) + var(--dock-h) + var(--s6))}
 
 .page{max-width:var(--page-max);margin:0 auto;padding:0 var(--s4) calc(var(--tab-b) + var(--tab-h) + var(--s7))}
 body.has-dock .page{padding-bottom:calc(var(--dock-b) + var(--dock-h) + var(--s7))}
@@ -152,7 +159,12 @@ body.has-dock .page{padding-bottom:calc(var(--dock-b) + var(--dock-h) + var(--s7
 /* .glass: translucent, refracting control surface. Specular rim on top, inner stroke, soft layered shadow,
    and a sheen that sits under the content (isolation keeps the ::before behind children) */
 .glass{position:relative;isolation:isolate;background:var(--glass);-webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);
-  box-shadow:inset 0 1px 0 var(--glass-rim),inset 0 -1px 0 var(--glass-rim-2),inset 0 0 0 .5px var(--glass-rim-2),0 0 0 .5px var(--glass-edge),var(--glass-shadow)}
+  box-shadow:inset 1.5px 1.5px 0 -.5px var(--glass-rim),inset -1.5px -1.5px 0 -.5px var(--glass-rim-2),inset 0 0 0 .5px var(--glass-rim-2),inset 0 0 14px var(--glass-glow),0 0 0 .5px var(--glass-edge),var(--glass-shadow)}
+.glass,.glass-tint{text-shadow:var(--glass-halo)}
+/* prominent glass: the same lens, tinted with the accent (primary actions) */
+.glass-tint{position:relative;isolation:isolate;background:var(--tint);color:var(--on-primary);-webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);text-shadow:none;
+  box-shadow:inset 1.5px 1.5px 0 -.5px var(--btn-hl),inset -1.5px -1.5px 0 -.5px color-mix(in srgb,var(--btn-hl) 50%,transparent),inset 0 0 14px var(--glass-glow),0 0 0 .5px color-mix(in srgb,var(--primary) 40%,transparent),0 8px 24px color-mix(in srgb,var(--primary) 26%,transparent)}
+.glass-tint::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;background:var(--glass-sheen);pointer-events:none}
 .glass::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;background:var(--glass-sheen);pointer-events:none}
 
 /* =========================================================
@@ -221,11 +233,12 @@ select.field{appearance:none;-webkit-appearance:none;background-image:linear-gra
 .fl{display:block}
 .fl>.t-label{display:block;color:var(--text-2);margin:0 0 var(--s2) var(--s1)}
 .fl+.fl{margin-top:var(--s5)}
-.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:var(--s4) var(--s3)}
+/* minmax(0,…): otherwise each input's intrinsic width pushes the right column off a phone screen */
+.fgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s4) var(--s3)}
 .fgrid .fl+.fl{margin-top:0}
 .unitfield{display:flex;align-items:center;background:var(--fill);border-radius:var(--r-sm);border:1px solid transparent;padding-right:var(--s3)}
 .unitfield:focus-within{border-color:var(--primary);background:var(--surface)}
-.unitfield input{flex:1;min-width:0;border:0;background:none;height:46px;padding:0 var(--s3);font:600 20px/26px var(--font);font-variant-numeric:tabular-nums}
+.unitfield input{flex:1;min-width:0;width:100%;border:0;background:none;height:46px;padding:0 var(--s3);font:600 20px/26px var(--font);font-variant-numeric:tabular-nums}
 .unitfield input:focus{outline:none}
 .unitfield input::placeholder{color:var(--text-3);font-weight:400}
 .unitfield span{color:var(--text-3);font:400 15px/20px var(--font)}
@@ -305,6 +318,7 @@ select.field{appearance:none;-webkit-appearance:none;background-image:linear-gra
 .dlg .btn-secondary{background:var(--lens)}
 
 /* Toast — glass capsule */
+.toast.glass{background:var(--glass-thick);-webkit-backdrop-filter:var(--glass-blur-thick);backdrop-filter:var(--glass-blur-thick)}
 .toast{position:fixed;left:50%;bottom:calc(var(--tab-b) + var(--tab-h) + var(--s3));z-index:30;transform:translate(-50%,12px) scale(.96);width:min(calc(var(--page-max) - 32px),calc(100% - 32px));min-height:52px;display:flex;align-items:center;justify-content:space-between;gap:var(--s3);padding:0 var(--s2) 0 var(--s5);color:var(--text);border-radius:var(--r-full);opacity:0;pointer-events:none;transition:opacity .2s,transform .4s cubic-bezier(.3,1.3,.5,1)}
 body.has-dock .toast{bottom:calc(var(--dock-b) + var(--dock-h) + var(--s3))}
 .toast.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
@@ -402,7 +416,6 @@ button.cal-d:active b{transform:scale(.9)}
 </main>
 <div class="dock" id="dock" hidden></div>
 <div class="edge edge-top" aria-hidden="true"></div>
-<div class="edge edge-bottom" aria-hidden="true"></div>
 <nav class="tabs glass" aria-label="主要導覽"><div class="tabs-in" id="tabs"></div></nav>
 <div class="toast glass" id="toast" role="status" aria-live="polite"></div>
 <div class="dlg" id="dlg"></div>
@@ -599,6 +612,9 @@ function trackKeyboard(){
   vv.addEventListener('resize',set);vv.addEventListener('scroll',set);set();
 }
 trackKeyboard();
+/* iOS date picker: `required` hides its 重置 button; if a value is still cleared somehow, put the previous one back */
+document.addEventListener('focusin',e=>{const t=e.target;if(t.type==='date')t.dataset.prev=t.value});
+document.addEventListener('change',e=>{const t=e.target;if(t.type==='date'&&!t.value&&t.dataset.prev)t.value=t.dataset.prev},true);
 /* opts.tall: top pinned under the status bar, for sheets whose content changes while typing */
 /* opts.head: html shown in the header instead of the title (the title stays for screen readers) */
 function openSheet(title,html,after,opts){
@@ -664,7 +680,7 @@ function renderTrain(){
   const title=d===t?'今天':d===addDays(t,-1)?'昨天':mdLong(d);
   const wk=weekKey(d), days=Array.from({length:7},(_,i)=>addDays(wk,i));
   const actions=`${d!==t?`<button class="btn btn-plain" data-act="today">今天</button>`:''}
-    <span class="iconbtn calbtn" aria-label="選擇日期">${IC.cal}<input type="date" id="dateIn" value="${d}" aria-label="選擇日期"></span>`;
+    <span class="iconbtn calbtn" aria-label="選擇日期">${IC.cal}<input type="date" id="dateIn" value="${d}" required aria-label="選擇日期"></span>`;
   const recent=allExercises().filter(n=>!s.items.some(i=>i.name===n)).slice(0,6);
   app.innerHTML=`${header(title,summaryText(d,st),actions)}
   <div class="week" role="group" aria-label="選擇日期">
@@ -676,7 +692,7 @@ function renderTrain(){
     <div class="empty"><p class="t-h3">${d===t?'今天還沒有動作':'這天沒有訓練紀錄'}</p><p class="t-callout c2">按下方「新增動作」開始，上次的重量會自動帶出來當參考。</p></div>
     ${recent.length?`<section class="sec" style="margin-top:0"><div class="sec-h"><h2 class="t-h3">最近做過</h2></div><div class="group">${recent.map(n=>{const l=lastBefore(n,addDays(t,1));
       return `<button class="row" data-act="pickex" data-name="${esc(n)}"><div class="row-main"><p class="t-body">${esc(n)}</p><p class="t-caption c2">${l?`${md(l.date)}　${esc(setsText(l.sets.slice(0,4),n))}`:esc(catOf(n))}</p></div><span class="c3" style="width:20px;height:20px">${IC.plus}</span></button>`}).join('')}</div></section>`:''}`}`;
-  $('#dateIn').addEventListener('change',e=>{if(e.target.value){ui.date=e.target.value;render()}});
+  $('#dateIn').addEventListener('change',e=>{if(e.target.value){ui.date=e.target.value;render()}else e.target.value=ui.date});
 }
 function exBlock(it,i,d){
   const n=it.name, lt=loadType(n), as=lt==='assist', last=lastBefore(n,d), pm=maxBefore(n,d), bw=as?bwOn(d):null;
@@ -897,7 +913,7 @@ function dockHTML(){
     <button class="btn" data-act="rtstop">${RT.done?'關閉':'結束'}</button></div></div>`;
   if(ui.tab!=='train')return '';
   return `<div class="dock-in"><button class="btn glass dock-rest" data-act="reststart" aria-label="開始組間休息">${IC.timer}${fmtSec(restFor(ui.lastEx))}</button>
-    <button class="btn btn-primary grow" data-act="openadd">${IC.plus}新增動作</button></div>`;
+    <button class="btn glass-tint grow" data-act="openadd">${IC.plus}新增動作</button></div>`;
 }
 function updateDock(){
   const el=$('#dock'),h=dockHTML();el.innerHTML=h;el.hidden=!h;document.body.classList.toggle('has-dock',!!h);
@@ -1070,7 +1086,7 @@ function renderBody(){
 function openWeight(){
   const d=todayStr(),rec=S.body[d]||{},prev=seriesOf('weight').filter(p=>p.d<d).pop();
   openSheet('記錄體重',`<div class="group pad">
-    <label class="fl"><span class="t-label">日期</span><input type="date" id="wDate" class="field" value="${d}"></label>
+    <label class="fl"><span class="t-label">日期</span><input type="date" id="wDate" class="field" value="${d}" required></label>
     <label class="fl"><span class="t-label">體重</span><span class="unitfield"><input id="wVal" inputmode="decimal" enterkeyhint="done" value="${rec.weight!=null?r1(bShow('weight',rec.weight)):''}" placeholder="${prev?r1(bShow('weight',prev.v)):'0'}"><span>${U()}</span></span>
       ${prev?`<span class="hint t-caption c3">上次 ${md(prev.d)}：${fmt(bShow('weight',prev.v))} ${U()}</span>`:''}</label></div>
     <button class="btn btn-primary btn-block" style="margin-top:24px" data-act="saveweight">儲存</button>`,
@@ -1085,7 +1101,7 @@ function openInbody(d){
   const rec=S.body[d]||{},prevKey=Object.keys(S.body).filter(k=>k<d).sort().pop(),pv=prevKey?S.body[prevKey]:{};
   const val=k=>rec[k]!=null?r1(bShow(k,rec[k])):'';
   openSheet(S.body[d]?'量測紀錄':'InBody 量測',`<div class="group pad">
-    <label class="fl"><span class="t-label">日期</span><input type="date" id="bDate" class="field" value="${d}"></label>
+    <label class="fl"><span class="t-label">日期</span><input type="date" id="bDate" class="field" value="${d}" required></label>
     <div class="fgrid" style="margin-top:20px">${BODY_FIELDS.map(([k,l])=>`<label class="fl"><span class="t-label">${l}</span>
       <span class="unitfield"><input id="f-${k}" inputmode="decimal" value="${val(k)}" placeholder="${pv[k]!=null?r1(bShow(k,pv[k])):''}"><span>${bUnit(k)}</span></span></label>`).join('')}</div>
     <p class="t-caption c3" style="margin-top:12px">只填有量的欄位。灰色數字是上一次的紀錄。</p></div>
