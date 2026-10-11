@@ -368,7 +368,7 @@ const IC={
    STATE & STORAGE
    ========================================================= */
 let S={meta:{height:null,unit:'kg',rest:90,autoRest:false,exercises:{}},sessions:{},body:{}};
-let ui={tab:'train',date:todayStr(),range:90,calMonth:todayStr().slice(0,7),prog:null,lastEx:null,newCat:null,newUnit:'kg',newLoad:'single',edit:null};
+let ui={tab:'train',date:todayStr(),range:90,calMonth:todayStr().slice(0,7),prog:null,lastEx:null,newCat:null,newUnit:'kg',newLoad:'single',addCat:null,creating:false,edit:null};
 let store=null;
 
 async function initStore(){
@@ -651,24 +651,68 @@ function deleteSet(i,j){
 }
 
 /* add-exercise sheet */
+/* names grouped in CATS order, keeping the incoming (most recent first) order inside each group */
+function groupByCat(names){
+  const g={};names.forEach(n=>(g[catOf(n)]=g[catOf(n)]||[]).push(n));
+  return CATS.filter(c=>g[c]).map(c=>[c,g[c]]);
+}
+/* every space-separated word must appear; case and spaces ignored ("滑輪 窄" finds 窄距滑輪下拉) */
+const normName=s=>s.toLowerCase().replace(/\s+/g,'');
+const matchName=(n,q)=>{const t=normName(n);return q.toLowerCase().split(/\s+/).filter(Boolean).every(w=>t.includes(w))};
+function addSearch(){
+  const q=($('#q')?.value||'').trim(), used=new Set((S.sessions[ui.date]?.items||[]).map(i=>i.name));
+  const hit=q?allExercises().filter(n=>!used.has(n)&&matchName(n,q)):[];
+  return {q,used,hit,exists:!!q&&(!!S.meta.exercises[q]||used.has(q))};
+}
 function openAdd(){
-  ui.newCat=null;ui.newUnit=U();ui.newLoad='single';
+  ui.newCat=null;ui.newUnit=U();ui.newLoad='single';ui.addCat=null;ui.creating=false;
   openSheet('新增動作',`
-    <label class="unitfield" style="padding-left:12px">${'<span style="width:20px;height:20px;color:var(--text-3)">'+IC.search+'</span>'}<input id="q" placeholder="搜尋或輸入新動作" autocomplete="off" enterkeyhint="done" style="font:400 17px/24px var(--font)"></label>
+    <label class="unitfield" style="padding-left:12px">${'<span style="width:20px;height:20px;color:var(--text-3)">'+IC.search+'</span>'}<input id="q" placeholder="搜尋動作，或輸入新名稱" autocomplete="off" enterkeyhint="search" style="font:400 17px/24px var(--font)"></label>
     <div id="sugg"></div>`,()=>{
-      const q=$('#q');q.addEventListener('input',drawSugg);
-      q.addEventListener('keydown',e=>{if(e.key!=='Enter')return;const v=q.value.trim();if(!v)return;
-        if(S.meta.exercises[v])addExercise(v);else if(ui.newCat)addExercise(v,ui.newCat,ui.newUnit,ui.newLoad);else toast('先選擇部位')});
+      const q=$('#q');
+      /* skip IME composition (注音 still being picked) so half-typed text doesn't flash "建立「ㄒㄧㄚ」" */
+      q.addEventListener('input',e=>{if(e.isComposing)return;ui.creating=false;drawSugg()});
+      q.addEventListener('compositionend',()=>{ui.creating=false;drawSugg()});
+      q.addEventListener('keydown',e=>{if(e.key!=='Enter'||e.isComposing)return;e.preventDefault();
+        const {q:v,hit,exists}=addSearch();if(!v)return;
+        if(S.meta.exercises[v])addExercise(v);
+        else if(hit.length===1&&!exists)addExercise(hit[0]);
+        else if(ui.creating&&ui.newCat)addExercise(v,ui.newCat,ui.newUnit,ui.newLoad);
+        else q.blur();
+      });
       drawSugg();
     });
 }
+function exPickRow(n){
+  const l=lastBefore(n,addDays(todayStr(),1));
+  return `<button class="row" data-act="pickex" data-name="${esc(n)}"><div class="row-main"><p class="t-body">${esc(n)}</p><p class="t-caption c2">${esc(catOf(n))}${l?`　${md(l.date)}　${esc(setsText(l.sets.slice(0,3),n))}`:''}</p></div></button>`;
+}
 function drawSugg(){
-  const q=($('#q')?.value||'').trim(), used=new Set((S.sessions[ui.date]?.items||[]).map(i=>i.name));
-  const all=allExercises().filter(n=>!used.has(n));
-  const hit=q?all.filter(n=>n.toLowerCase().includes(q.toLowerCase())):all;
-  const exists=q&&(S.meta.exercises[q]||used.has(q));
+  const {q,used,hit,exists}=addSearch();
   let h='';
-  if(q&&!exists){
+  if(!q){
+    /* browse: category filter, then 最近做過 + one list per category */
+    const all=allExercises().filter(n=>!used.has(n)), groups=groupByCat(all);
+    if(!all.length){$('#sugg').innerHTML=`<div class="empty"><p class="t-callout c2">${used.size?'動作庫裡的動作都已經在今天的清單裡。輸入名稱可以建立新動作。':'輸入第一個動作的名稱，例如「臥推」或「腿推機」。'}</p></div>`;return}
+    if(ui.addCat&&!groups.some(([c])=>c===ui.addCat))ui.addCat=null;
+    if(groups.length>1)h+=`<div class="choices" role="group" aria-label="依部位篩選" style="margin-top:16px">${[[null,'全部'],...groups.map(([c])=>[c,c])].map(([c,l])=>`<button data-act="addcat" data-c="${c??''}" aria-pressed="${ui.addCat===c}">${l}</button>`).join('')}</div>`;
+    const sec=(title,names)=>`<div class="sec" style="margin-top:24px"><div class="sec-h"><h3 class="t-h3">${title}</h3><span class="t-caption c3">${names.length}</span></div><div class="group">${names.map(exPickRow).join('')}</div></div>`;
+    if(ui.addCat)h+=sec(esc(ui.addCat),groups.find(([c])=>c===ui.addCat)[1]);
+    else{
+      const recent=all.filter(n=>lastBefore(n,addDays(todayStr(),1))).slice(0,5);
+      if(recent.length&&all.length>8)h+=sec('最近做過',recent);
+      groups.forEach(([c,ns])=>h+=sec(esc(c),ns));
+    }
+    $('#sugg').innerHTML=h;return;
+  }
+  /* search: matches first, creating a new exercise comes after */
+  if(hit.length)h+=`<div class="sec" style="margin-top:24px"><div class="sec-h"><h3 class="t-h3">符合的動作</h3><span class="t-caption c3">${hit.length}</span></div><div class="group">${hit.map(exPickRow).join('')}</div></div>`;
+  if(used.has(q))h+=`<p class="t-callout c2" style="margin:24px 4px 0">「${esc(q)}」已經在今天的清單裡。</p>`;
+  else if(!exists&&!hit.length&&!ui.creating)h+=`<p class="t-callout c2" style="margin:24px 4px 0">動作庫裡沒有符合「${esc(q)}」的動作。</p>`;
+  if(!exists&&!ui.creating){
+    h+=`<div class="group" style="margin-top:12px"><button class="row" data-act="creating"><span style="width:20px;height:20px;color:var(--primary)">${IC.plus}</span><span class="row-main t-body" style="color:var(--primary)">建立新動作「${esc(q)}」</span></button></div>`;
+  }
+  if(!exists&&ui.creating){
     h+=`<div class="sec" style="margin-top:24px"><div class="sec-h"><h3 class="t-h3">建立「${esc(q)}」</h3></div><div class="group pad">
       <div class="fl"><span class="t-label">部位</span><div class="choices">${CATS.map(c=>`<button data-act="ncat" data-c="${c}" aria-pressed="${ui.newCat===c}">${c}</button>`).join('')}</div></div>
       <div class="fl"><span class="t-label">重量計算</span><div class="seg">${LOADS.map(([v,l])=>`<button data-act="nload" data-v="${v}" aria-pressed="${ui.newLoad===v}">${l}</button>`).join('')}</div>
@@ -676,13 +720,6 @@ function drawSugg(){
       <div class="fl"><span class="t-label">預設單位</span><div class="seg">${['kg','lb'].map(u=>`<button data-act="nunit" data-u="${u}" aria-pressed="${ui.newUnit===u}">${u}</button>`).join('')}</div></div>
       <button class="btn btn-primary btn-block" style="margin-top:24px" data-act="addnew" ${ui.newCat?'':'disabled'}>${ui.newCat?'加入今天的訓練':'選擇部位後加入'}</button>
     </div></div>`;
-  }
-  if(hit.length){
-    h+=`<div class="sec" style="margin-top:24px"><div class="sec-h"><h3 class="t-h3">${q?'符合的動作':'動作庫'}</h3><span class="t-caption c3">${hit.length}</span></div>
-    <div class="group">${hit.slice(0,50).map(n=>{const l=lastBefore(n,addDays(todayStr(),1));
-      return `<button class="row" data-act="pickex" data-name="${esc(n)}"><div class="row-main"><p class="t-body">${esc(n)}</p><p class="t-caption c2">${esc(catOf(n))}${l?`　${md(l.date)}　${esc(setsText(l.sets.slice(0,3),n))}`:''}</p></div></button>`}).join('')}</div></div>`;
-  }else if(!q){
-    h+=`<div class="empty"><p class="t-callout c2">輸入第一個動作的名稱，例如「臥推」或「腿推機」。</p></div>`;
   }
   $('#sugg').innerHTML=h;
 }
@@ -730,8 +767,9 @@ async function delExDb(){
 }
 function openLib(){
   const names=allExercises();
-  openSheet('動作庫',names.length?`<p class="t-callout c2" style="margin:0 4px 12px">建立過的動作都在這裡，下次新增時可以直接選。</p><div class="group">${names.map(n=>{const c=useCount(n);
-    return `<button class="row" data-act="editex" data-name="${esc(n)}"><div class="row-main"><p class="t-body">${esc(n)}</p><p class="t-caption c2">${esc(catOf(n))}　${LOADS.find(l=>l[0]===loadType(n))[1]}　${c} 天</p></div><span class="chev">${IC.chevR}</span></button>`}).join('')}</div>`
+  openSheet('動作庫',names.length?`<p class="t-callout c2" style="margin:0 4px">建立過的動作都在這裡，下次新增時可以直接選。點一下可以修改部位。</p>${groupByCat(names).map(([cat,ns])=>
+    `<div class="sec" style="margin-top:24px"><div class="sec-h"><h3 class="t-h3">${esc(cat)}</h3><span class="t-caption c3">${ns.length}</span></div><div class="group">${ns.map(n=>{const c=useCount(n);
+    return `<button class="row" data-act="editex" data-name="${esc(n)}"><div class="row-main"><p class="t-body">${esc(n)}</p><p class="t-caption c2">${LOADS.find(l=>l[0]===loadType(n))[1]}　${c} 天</p></div><span class="chev">${IC.chevR}</span></button>`}).join('')}</div></div>`).join('')}`
   :`<div class="empty"><p class="t-callout c2">還沒有動作。在訓練頁按「新增動作」建立。</p></div>`);
 }
 
@@ -1059,6 +1097,8 @@ document.body.addEventListener('click',e=>{
     case 'openadd': openAdd();break;
     case 'pickex': addExercise(b.dataset.name);break;
     case 'ncat': ui.newCat=b.dataset.c;drawSugg();break;
+    case 'addcat': ui.addCat=b.dataset.c||null;drawSugg();break;
+    case 'creating': ui.creating=true;if(!ui.newCat&&ui.addCat)ui.newCat=ui.addCat;drawSugg();break;
     case 'nload': ui.newLoad=b.dataset.v;drawSugg();break;
     case 'nunit': ui.newUnit=b.dataset.u;drawSugg();break;
     case 'addnew': addExercise($('#q').value,ui.newCat,ui.newUnit,ui.newLoad);break;
