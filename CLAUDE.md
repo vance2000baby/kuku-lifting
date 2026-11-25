@@ -83,7 +83,8 @@ S = {
 
 - `w` 是使用者輸入的原始數字，`u` 是那一組的單位。重量類身體數據（weight、muscle、fatMass）一律以 **kg** 儲存。
 - `migrate()`：v3 強制 `autoRest=false`；v4 加入 `done` 旗標（舊資料凡有次數的組都標為完成）；每次啟動清除「沒有任何紀錄、也沒有備註」的孤兒動作。修改 schema 時遞增 `v`，並在 `migrate()` 補遷移。
-- 匯出格式：`{ app: 'gymlog', version, exported, meta, sessions, body }`。匯入時會檢查 `app === 'gymlog'`，並以合併方式寫入。
+- `backfillDone(session)` 是 v4 遷移的共用邏輯（只補 `done === undefined` 且有次數的組，明確的 `done: false` 不動）。`migrate()` 只在 `v < 4` 時跑；**匯入也必須跑**，且先補旗標再寫入，因為 App 通常早已升到 v4，舊備份不會再經過 `migrate()`。只對 `version` 與 `meta.v` 都小於 4 的備份補，v4 備份缺少旗標代表那是使用者沒勾完成的組。
+- 匯出格式：`{ app: 'gymlog', version, exported, meta, sessions, body }`。匯入時會檢查 `app === 'gymlog'`，並以合併方式寫入（同一天的紀錄以備份為準）。
 - 匯出：支援 `navigator.canShare({ files })` 時用 `navigator.share`（iOS 分享選單 → 儲存到「檔案」），否則退回 Blob 下載。使用者取消分享不算備份。
 - 備份提醒：`backupDue()` 在超過 14 天沒備份時成立（從沒備份過就從最早一筆紀錄起算）。設定頁顯示「上次備份」，逾期時改用 warning 色；`backupNotice()` 只出現在「進度」和「身體」頁，不會在訓練中打擾，按「稍後」隱藏 3 天。
 

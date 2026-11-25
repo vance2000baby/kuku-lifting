@@ -1194,7 +1194,10 @@ function importFile(e){
       /* the imported file is itself a backup, so it counts toward 上次備份 */
       if(d.exported&&!(S.meta.lastBackup>=d.exported))S.meta.lastBackup=d.exported;
       await store.saveMeta(S.meta);
-      for(const [k,v] of Object.entries(d.sessions||{})){S.sessions[k]=v;await store.saveSession(k,v)}
+      /* a backup from before v4 has no done flags at all; fix them before saving, or its sets never count.
+         A v4 backup's missing flag is a set the user never checked, so it is left alone. */
+      const old=(Math.max(d.version||0,d.meta?.v||0))<4;
+      for(const [k,v] of Object.entries(d.sessions||{})){if(old)backfillDone(v);S.sessions[k]=v;await store.saveSession(k,v)}
       for(const [k,v] of Object.entries(d.body||{})){S.body[k]=v;await store.saveBody(k,v)}
       migrate();closeSheet();render();toast('匯入完成');
     }catch(err){toast('匯入失敗，請再試一次')}
@@ -1351,12 +1354,17 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&RT.on&&!R
 /* =========================================================
    BOOT
    ========================================================= */
+/* v4 added the done flag. Data from before it has no flag: a recorded set (has reps) counts as done.
+   An explicit done:false is a real un-checked set and is left alone. */
+function backfillDone(s){
+  let ch=false;(s?.items||[]).forEach(it=>(it.sets||[]).forEach(x=>{if(x.r&&x.done===undefined){x.done=true;ch=true}}));
+  return ch;
+}
 function migrate(){
   const m=S.meta;
   if((m.v||0)<3)m.autoRest=false;
   if((m.v||0)<4){
-    /* v4: sets need an explicit done flag; everything recorded before had values = done */
-    Object.entries(S.sessions).forEach(([k,s])=>{let ch=false;(s.items||[]).forEach(it=>it.sets.forEach(x=>{if(x.r&&!x.done){x.done=true;ch=true}}));if(ch)saveSession(k)});
+    Object.entries(S.sessions).forEach(([k,s])=>{if(backfillDone(s))saveSession(k)});
     m.v=4;saveMeta();
   }
   const orphans=Object.keys(m.exercises).filter(n=>useCount(n)===0&&!m.exercises[n].note);
