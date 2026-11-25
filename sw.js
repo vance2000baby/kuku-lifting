@@ -1,7 +1,9 @@
 /* 別肌動 service worker — app shell, cache-first.
    每次部署有改到任何檔案，都要遞增 VERSION，否則使用者會一直拿到舊的快取。 */
-const VERSION = 'v11';
+const VERSION = 'v12';
 const CACHE = `kuku-${VERSION}`;
+/* Resolve every shell URL against this worker's own URL once, so the precache keys
+   and the navigation lookup below can never disagree about the relative base. */
 const SHELL = [
   './',
   'index.html',
@@ -11,7 +13,8 @@ const SHELL = [
   'icons/icon-192.png',
   'icons/icon-512.png',
   'icons/icon-maskable-512.png'
-];
+].map(u => new URL(u, self.location).href);
+const INDEX = new URL('index.html', self.location).href;
 
 self.addEventListener('install', e => {
   /* cache:'reload' skips the HTTP cache so a new version never precaches stale files */
@@ -29,7 +32,7 @@ self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET' || new URL(req.url).origin !== location.origin) return;
   if (req.mode === 'navigate') {
-    e.respondWith(caches.match('index.html').then(r => r || fetch(req)));
+    e.respondWith(caches.match(INDEX).then(r => r || fetch(req)));
     return;
   }
   e.respondWith(caches.match(req).then(hit => hit || fetch(req).then(res => {

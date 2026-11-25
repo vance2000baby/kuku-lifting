@@ -14,6 +14,25 @@
 <meta name="apple-mobile-web-app-title" content="別肌動">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <script src="vendor/chart.umd.min.js"></script>
+<script>
+/* Solid materials, decided before first paint. Older WebKit ignores @media (prefers-reduced-transparency)
+   wholesale, so ask matchMedia directly: an unknown feature answers 'not all', which is how support is detected.
+   The same applies when the engine cannot blur (CSS.supports). CSS reads the answer as [data-mat="solid"]. */
+(function(){
+  var root=document.documentElement,q=null;
+  try{q=matchMedia('(prefers-reduced-transparency: reduce)')}catch(e){}
+  var supported=!!q&&q.media!=='not all';
+  var canBlur=false;
+  try{canBlur=!!(window.CSS&&CSS.supports)&&(CSS.supports('backdrop-filter','blur(1px)')||CSS.supports('-webkit-backdrop-filter','blur(1px)'))}catch(e){}
+  function apply(){
+    var solid=!canBlur;
+    if(!solid){try{solid=supported&&q.matches}catch(e){}}
+    if(solid)root.setAttribute('data-mat','solid');else root.removeAttribute('data-mat');
+  }
+  apply();
+  try{if(q){if(q.addEventListener)q.addEventListener('change',apply);else if(q.addListener)q.addListener(apply)}}catch(e){}
+})();
+</script>
 <style>
 /* =========================================================
    1. DESIGN TOKENS
@@ -120,6 +139,9 @@
 @media (prefers-contrast: more){
   :root:root:root{--mat-stroke:var(--border);--mat-chrome:var(--elevated);--text-3:var(--text-2)}
 }
+/* Same rule decided by script (data-mat), for engines that ignore the media queries above.
+   Same declarations as the fallbacks; the attribute selector adds weight so the dark blocks cannot win. */
+:root:root:root[data-mat="solid"]{--mat-chrome:var(--elevated);--mat-overlay:var(--bg)}
 
 /* typography — weight and size carry hierarchy; only titles are bold */
 .t-display{font:700 32px/38px var(--font);letter-spacing:-.012em}
@@ -259,6 +281,7 @@ select.field{appearance:none;-webkit-appearance:none;background-image:linear-gra
 /* Toolbar row */
 .dock{height:var(--h-control)}
 .dock[hidden]{display:none}
+.bars[hidden]{display:none}
 .dock-in{position:relative;display:flex;align-items:center;gap:var(--s1);height:100%}
 .dock .btn{min-height:var(--h-control);height:var(--h-control);border-radius:var(--r-full)}
 .dock-rest{background:none;color:var(--text);padding:0 var(--s3);font-variant-numeric:tabular-nums}
@@ -417,7 +440,7 @@ button.cal-d:active b{background:var(--primary-press)}
   <div class="sk" style="height:220px;border-radius:var(--r-md)"></div>
 </main>
 <div class="edge-top" aria-hidden="true"></div>
-<div class="bars mat-chrome"><div class="dock" id="dock" hidden></div><nav class="tabs" aria-label="主要導覽"><div class="tabs-in" id="tabs"></div></nav></div>
+<div class="bars mat-chrome" id="bars"><div class="dock" id="dock" hidden></div><nav class="tabs" aria-label="主要導覽"><div class="tabs-in" id="tabs"></div></nav></div>
 <div class="toast mat-overlay" id="toast" role="status" aria-live="polite"></div>
 <div class="dlg" id="dlg"></div>
 <div class="scrim" id="scrim" data-act="close"></div>
@@ -480,8 +503,25 @@ async function initStore(){
   const K='gymlog-v1';
   /* throws on failure (e.g. QuotaExceededError) so queue() can surface it */
   const write=()=>localStorage.setItem(K,JSON.stringify(S));
-  store={kind:'local',async load(){try{return JSON.parse(localStorage.getItem(K))}catch{return null}},
-    saveMeta:write,saveSession:write,delSession:write,saveBody:write,delBody:write};
+  /* an unreadable value must not look like a fresh install, or boot lets migrate() overwrite it.
+     Keep the raw text under its own key (never replacing a different earlier copy) and hand it to boot. */
+  function stash(raw){
+    const base=`${K}-corrupt-${todayStr()}`;
+    let key=base;
+    try{
+      for(let n=2;localStorage.getItem(key)!=null&&localStorage.getItem(key)!==raw;n++)key=`${base}-${n}`;
+      localStorage.setItem(key,raw);return key;
+    }catch(e){console.warn(e);return null}
+  }
+  store={kind:'local',async load(){
+      const raw=localStorage.getItem(K);
+      if(raw==null)return null;
+      let d;try{d=JSON.parse(raw)}catch{d=undefined}
+      return d&&typeof d==='object'&&!Array.isArray(d)?d:{corrupt:true,raw,key:stash(raw)};
+    },
+    saveMeta:write,saveSession:write,delSession:write,saveBody:write,delBody:write,
+    /* only after the user agrees to start over; the corrupt copy stays under its own key */
+    discard:()=>localStorage.removeItem(K)};
 }
 /* saving is silent; only failures surface */
 const timers={},pending={};
@@ -650,6 +690,7 @@ const app=$('#app');
 const charts={};
 function render(){
   Object.values(charts).forEach(c=>c.destroy());for(const k in charts)delete charts[k];
+  $('#bars').hidden=false;
   renderTabs();
   app.removeAttribute('aria-busy');
   ui.tab==='train'?renderTrain():ui.tab==='prog'?renderProg():renderBody();
@@ -1167,18 +1208,23 @@ function openSettings(){
     $('#imp').addEventListener('change',importFile);
   });
 }
+/* iOS: share sheet → 儲存到「檔案」; elsewhere fall back to a plain download.
+   Returns 'ok' / 'cancel' (the user dismissed the share sheet) / 'fail'. */
+async function saveFile(text,filename,type='application/json'){
+  const file=new File([text],filename,{type});
+  if(navigator.canShare&&navigator.canShare({files:[file]})){
+    try{await navigator.share({files:[file]});return 'ok'}
+    catch(e){if(e.name==='AbortError')return 'cancel';console.warn(e);return 'fail'}
+  }
+  const a=document.createElement('a'),url=URL.createObjectURL(file);
+  a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  return 'ok';
+}
 async function exportData(){
   const text=JSON.stringify({app:'gymlog',version:4,exported:new Date().toISOString(),...S},null,1);
-  const filename=`別肌動備份-${todayStr()}.json`;
-  const file=new File([text],filename,{type:'application/json'});
-  /* iOS: share sheet → 儲存到「檔案」; elsewhere fall back to a plain download */
-  if(navigator.canShare&&navigator.canShare({files:[file]})){
-    try{await navigator.share({files:[file]})}
-    catch(e){if(e.name!=='AbortError'){toast('沒有匯出備份');console.warn(e)}return}
-  }else{
-    const a=document.createElement('a'),url=URL.createObjectURL(file);
-    a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
-  }
+  const r=await saveFile(text,`別肌動備份-${todayStr()}.json`);
+  if(r==='fail')toast('沒有匯出備份');
+  if(r!=='ok')return;
   S.meta.lastBackup=new Date().toISOString();saveMeta();render();
   const info=$('#bkInfo');if(info){info.className='t-caption c2';info.style.color='';info.textContent=backupText()}
   toast('已匯出備份');
@@ -1270,6 +1316,8 @@ document.body.addEventListener('click',e=>{
     case 'savebody': saveInbody(b.dataset.orig);break;
     case 'delbody':{const k=b.dataset.d;askConfirm(`刪除 ${mdLong(k)} 的量測紀錄？`).then(ok=>{if(!ok)return;delete S.body[k];saveBodyRec(k);closeSheet();render();toast('已刪除')});break}
     case 'export': exportData();break;
+    case 'rescuedl': rescueExport();break;
+    case 'rescueblank': rescueBlank();break;
     case 'snoozebackup': try{localStorage.setItem(SNOOZE_K,addDays(todayStr(),3))}catch{}render();break;
     case 'range': ui.range=+b.dataset.n;render();break;
     case 'calmonth':{const [y,m]=ui.calMonth.split('-').map(Number),x=new Date(y,m-1+(+b.dataset.n),1);ui.calMonth=ymd(x).slice(0,7);render();break}
@@ -1370,9 +1418,34 @@ function migrate(){
   const orphans=Object.keys(m.exercises).filter(n=>useCount(n)===0&&!m.exercises[n].note);
   if(orphans.length){orphans.forEach(n=>delete m.exercises[n]);saveMeta()}
 }
+/* the saved value could not be parsed: stop here, keep it untouched, and let the user export it before anything writes */
+let rescue=null;
+function renderRescue(){
+  $('#bars').hidden=true;
+  app.removeAttribute('aria-busy');
+  app.innerHTML=`<header class="ph"><div class="ph-row"><h1 class="t-display">資料讀取失敗</h1></div></header>
+    <div class="group"><div class="pad">
+      <p class="t-body">這台裝置上的紀錄無法讀取，可能是儲存時中斷造成。原始資料已保留，尚未被覆蓋。</p>
+      <p class="t-callout c2" style="margin-top:var(--s2)">${rescue.key?`原始資料也另存了一份（<span class="num">${esc(rescue.key)}</span>）。`:'原始資料目前還留在原本的位置。'}建議先匯出，需要時可交給備份檔案之外的副本保存。</p>
+    </div></div>
+    <div class="group" style="margin-top:var(--s4)">
+      <button class="row" data-act="rescuedl"><span class="row-main t-body" style="color:var(--primary)">匯出原始資料</span></button>
+      <button class="row" data-act="rescueblank"><span class="row-main t-body" style="color:var(--error)">以空白資料開啟</span></button>
+    </div>
+    <p class="t-caption c3" style="margin:var(--s3) var(--s1) 0">選「以空白資料開啟」會蓋掉這份無法讀取的資料，之後只能從匯出的檔案救回。</p>`;
+}
+async function rescueExport(){
+  const r=await saveFile(rescue.raw,`別肌動原始資料-${todayStr()}.txt`,'text/plain');
+  if(r==='ok')toast('已匯出原始資料');
+  else if(r==='fail')toast('沒有匯出，請再試一次');
+}
+async function rescueBlank(){
+  if(!await askConfirm('以空白資料開啟會蓋掉目前無法讀取的紀錄，且無法復原。確定要繼續？','以空白開啟'))return;
+  rescue=null;store.discard();await boot();
+}
 /* new version: prompt while the app is open; one that installed while it was closed is applied on the next launch */
 function initSW(){
-  if(!('serviceWorker' in navigator))return;
+  if(!('serviceWorker' in navigator)||initSW.done)return;initSW.done=true;
   const sw=navigator.serviceWorker, hadCtrl=!!sw.controller;
   let reloading=false;
   sw.addEventListener('controllerchange',()=>{if(!hadCtrl||reloading)return;reloading=true;flushSaves().finally(()=>location.reload())});
@@ -1386,16 +1459,18 @@ function initSW(){
   }).catch(e=>console.warn(e));
 }
 document.addEventListener('visibilitychange',()=>{if(document.hidden)flushSaves()});
-(async()=>{
-  await initStore();
-  try{const d=await store.load();if(d)S={meta:Object.assign({height:null,unit:'kg',rest:90,autoRest:false,exercises:{}},d.meta||{}),sessions:d.sessions||{},body:d.body||{}}}
+async function boot(){
+  try{const d=await store.load();
+    if(d?.corrupt){rescue=d;renderRescue();return}
+    if(d)S={meta:Object.assign({height:null,unit:'kg',rest:90,autoRest:false,exercises:{}},d.meta||{}),sessions:d.sessions||{},body:d.body||{}}}
   catch(e){console.warn(e);app.innerHTML=`<div class="empty"><p class="t-h3">讀取資料失敗</p><p class="t-callout c2">請關閉 App 後重新開啟。</p></div>`;return}
   migrate();
   const ls=S.sessions[todayStr()]?.items;if(ls?.length)ui.lastEx=ls[ls.length-1].name;
   render();
   try{navigator.storage?.persist?.().catch(()=>{})}catch{}
   initSW();
-})();
+}
+(async()=>{await initStore();await boot()})();
 </script>
 </body>
 </html>
