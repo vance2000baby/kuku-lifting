@@ -48,6 +48,7 @@
   /* an edge that must be read, not just sensed: unchecked circle, toggle track, segmented thumb, grab handle */
   --control-stroke:#8B8983;
   --primary:#1F6B4F; --primary-press:#17573F; --on-primary:#FFFFFF; --primary-soft:#E2EEE8;
+  --set-next-bg:#E2EEE8;  /* the working set's row tint — light green wash, readable under text and placeholders */
   --success:#237A4F; --success-soft:#E3F0E8; --warning:#965C0B; --warning-soft:#F7EAD2; --error:#BE3B28; --error-soft:#FAE7E3; --on-error:#FFFFFF;
   --disabled:#C3C1BB; --scrim:rgba(20,20,18,.3);
   --press:rgba(20,20,18,.06);               /* pressed / selected tint on controls */
@@ -106,6 +107,7 @@
     --border:#3B3A36; --divider:#2B2A27; --divider-raised:#36352F;
     --control-stroke:#7A7873;
     --primary:#62C095; --primary-press:#4FAA81; --on-primary:#0D1A13; --primary-soft:#1D3228;
+    --set-next-bg:#24352B;
     --success:#6CC79A; --success-soft:#17301F; --warning:#E2A647; --warning-soft:#392D17; --error:#EF7A66; --error-soft:#3A1D18; --on-error:#1C0D0A;
     --disabled:#55534F; --scrim:rgba(0,0,0,.5);
     --press:rgba(255,255,255,.08); --thumb:#5A5A55; --knob:#FFFFFF;
@@ -126,6 +128,7 @@
     --border:#3B3A36; --divider:#2B2A27; --divider-raised:#36352F;
     --control-stroke:#7A7873;
     --primary:#62C095; --primary-press:#4FAA81; --on-primary:#0D1A13; --primary-soft:#1D3228;
+    --set-next-bg:#24352B;
     --success:#6CC79A; --success-soft:#17301F; --warning:#E2A647; --warning-soft:#392D17; --error:#EF7A66; --error-soft:#3A1D18; --on-error:#1C0D0A;
     --disabled:#55534F; --scrim:rgba(0,0,0,.5);
     --press:rgba(255,255,255,.08); --thumb:#5A5A55; --knob:#FFFFFF;
@@ -473,10 +476,13 @@ button.cal-d:active b{background:var(--primary-press)}
 .set.done .unit{text-decoration-color:transparent}
 .idx{font:400 15px/20px var(--font);font-variant-numeric:tabular-nums;color:var(--text-3);text-align:center}
 .idx.pr{color:var(--warning);font-weight:600;font-size:13px}
-/* the working set is marked by shape — a ring around the whole row and a heavier number — not by the accent alone,
-   so it never reads as the same signal as a done set's filled circle */
-.set.next::after{content:"";position:absolute;inset:0;border-radius:var(--r-sm);box-shadow:inset 0 0 0 1.5px var(--primary);pointer-events:none}
-.set.next .idx{color:var(--text);font-weight:600}
+/* the working set is marked by a full-bleed tint — the row itself lights up edge to edge (no radius: it would
+   cut the hairline between rows). The fields turn solid so numbers and grey placeholders keep their contrast,
+   and the set number carries the accent. No ring: the done set's filled circle stays the only other shape. */
+.set.next{background:var(--set-next-bg)}
+.set.next .nf{background:var(--surface)}
+.set.next .idx{color:var(--primary);font-weight:600}
+.set.next .idx.pr{color:var(--warning)}
 .nf{display:flex;align-items:center;height:var(--h-control);border-radius:var(--r-sm);background:var(--fill);min-width:0;transition:background-color var(--dur-1) var(--ease)}
 .nf:focus-within{background:var(--surface);box-shadow:inset 0 0 0 2px var(--primary)}
 .nf input{flex:1;min-width:0;width:100%;height:var(--h-control);border:0;background:none;padding:0 0 0 var(--s3);font:600 20px/26px var(--font);font-variant-numeric:tabular-nums}
