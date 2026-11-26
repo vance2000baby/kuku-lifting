@@ -41,16 +41,20 @@
   /* color — semantic */
   --bg:#F6F5F2; --surface:#FFFFFF; --surface-raised:#FFFFFF; --elevated:#FFFFFF;
   --fill:#EFEEEA; --fill-2:#E4E2DC; --fill-raised:#EFEEEA;
-  --text:#1C1C1A; --text-2:#5F5E59; --text-3:#8C8A84;
+  /* text-3 is the quietest text that still carries meaning (units, captions, metadata):
+     it clears 4.5:1 on bg, surface and fill, so nothing readable is also unreadable */
+  --text:#1C1C1A; --text-2:#5F5E59; --text-3:#65635D;
   --border:#D9D7D1; --divider:#E9E7E2; --divider-raised:#E9E7E2;
+  /* an edge that must be read, not just sensed: unchecked circle, toggle track, segmented thumb, grab handle */
+  --control-stroke:#8B8983;
   --primary:#1F6B4F; --primary-press:#17573F; --on-primary:#FFFFFF; --primary-soft:#E2EEE8;
-  --success:#237A4F; --warning:#A2650F; --warning-soft:#F7EAD2; --error:#BE3B28; --on-error:#FFFFFF;
+  --success:#237A4F; --success-soft:#E3F0E8; --warning:#965C0B; --warning-soft:#F7EAD2; --error:#BE3B28; --error-soft:#FAE7E3; --on-error:#FFFFFF;
   --disabled:#C3C1BB; --scrim:rgba(20,20,18,.3);
   --press:rgba(20,20,18,.06);               /* pressed / selected tint on controls */
   --thumb:#FFFFFF; --knob:#FFFFFF;          /* segmented thumb, toggle knob */
   /* data colors (charts only) */
-  --cat-legs:#C8553D; --cat-back:#3D6CA8; --cat-chest:#C29129; --cat-shoulder:#2E8559;
-  --cat-arms:#8467AE; --cat-core:#7B7974; --cat-other:#B4B2AC;
+  --cat-legs:#C8553D; --cat-back:#3D6CA8; --cat-chest:#A87C1F; --cat-shoulder:#2E8559;
+  --cat-arms:#8467AE; --cat-core:#7B7974; --cat-other:#91908A;
   /* materials — exactly two (see .mat-chrome / .mat-overlay) */
   --mat-chrome:rgba(250,249,247,.7);       /* floating controls over scrolling content */
   --mat-chrome-blur:blur(14px) saturate(180%);
@@ -78,10 +82,13 @@
   --h-bars-dock:calc(var(--h-bars) + var(--h-control) + var(--bar-pad));
   --r-bar:30px;  /* bottom panel; inner capsules are concentric: 30 − 6 = 24 */
   --icon-xs:18px; --icon-sm:20px; --icon:22px; --icon-lg:24px;
+  /* swipe-to-delete: the revealed button, and how far the row may travel */
+  --set-del-w:88px; --set-swipe-max:112px;
   /* motion: short and settled, no overshoot */
   --dur-1:.15s; --dur-2:.25s; --dur-3:.38s;
   --ease:cubic-bezier(.2,.8,.2,1); --ease-sheet:cubic-bezier(.32,.72,0,1);
   /* type */
+  --t-metric:44px;  /* the one number a screen is about (身體頁的體重) */
   --font:-apple-system,BlinkMacSystemFont,"PingFang TC","Segoe UI","Microsoft JhengHei","Noto Sans TC","Noto Sans CJK TC",Roboto,"Helvetica Neue",sans-serif;
   /* layout */
   --page-max:600px; --bar-max:420px;
@@ -95,13 +102,14 @@
   :root:not([data-theme="light"]){
     --bg:#121211; --surface:#1C1C1A; --surface-raised:#262624; --elevated:#262624;
     --fill:#2A2A27; --fill-2:#34342F; --fill-raised:#34342F;
-    --text:#F2F1EE; --text-2:#A9A7A1; --text-3:#7D7B76;
+    --text:#F2F1EE; --text-2:#A9A7A1; --text-3:#9E9C96;
     --border:#3B3A36; --divider:#2B2A27; --divider-raised:#36352F;
+    --control-stroke:#7A7873;
     --primary:#62C095; --primary-press:#4FAA81; --on-primary:#0D1A13; --primary-soft:#1D3228;
-    --success:#6CC79A; --warning:#E2A647; --warning-soft:#392D17; --error:#EF7A66; --on-error:#1C0D0A;
+    --success:#6CC79A; --success-soft:#17301F; --warning:#E2A647; --warning-soft:#392D17; --error:#EF7A66; --error-soft:#3A1D18; --on-error:#1C0D0A;
     --disabled:#55534F; --scrim:rgba(0,0,0,.5);
     --press:rgba(255,255,255,.08); --thumb:#5A5A55; --knob:#FFFFFF;
-    --cat-legs:#E07A63; --cat-back:#6E98D3; --cat-chest:#DDB04E; --cat-shoulder:#5DB585; --cat-arms:#A88BD1; --cat-core:#9A9893; --cat-other:#5E5C58;
+    --cat-legs:#E07A63; --cat-back:#6E98D3; --cat-chest:#DDB04E; --cat-shoulder:#5DB585; --cat-arms:#A88BD1; --cat-core:#9A9893; --cat-other:#7A7873;
     --mat-chrome:rgba(38,38,36,.7); --mat-overlay:rgba(30,30,28,.94);
     --mat-stroke:rgba(255,255,255,.09); --mat-highlight:rgba(255,255,255,.06);
     --shadow-float:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.35);
@@ -114,13 +122,14 @@
 :root[data-theme="dark"]{
     --bg:#121211; --surface:#1C1C1A; --surface-raised:#262624; --elevated:#262624;
     --fill:#2A2A27; --fill-2:#34342F; --fill-raised:#34342F;
-    --text:#F2F1EE; --text-2:#A9A7A1; --text-3:#7D7B76;
+    --text:#F2F1EE; --text-2:#A9A7A1; --text-3:#9E9C96;
     --border:#3B3A36; --divider:#2B2A27; --divider-raised:#36352F;
+    --control-stroke:#7A7873;
     --primary:#62C095; --primary-press:#4FAA81; --on-primary:#0D1A13; --primary-soft:#1D3228;
-    --success:#6CC79A; --warning:#E2A647; --warning-soft:#392D17; --error:#EF7A66; --on-error:#1C0D0A;
+    --success:#6CC79A; --success-soft:#17301F; --warning:#E2A647; --warning-soft:#392D17; --error:#EF7A66; --error-soft:#3A1D18; --on-error:#1C0D0A;
     --disabled:#55534F; --scrim:rgba(0,0,0,.5);
     --press:rgba(255,255,255,.08); --thumb:#5A5A55; --knob:#FFFFFF;
-    --cat-legs:#E07A63; --cat-back:#6E98D3; --cat-chest:#DDB04E; --cat-shoulder:#5DB585; --cat-arms:#A88BD1; --cat-core:#9A9893; --cat-other:#5E5C58;
+    --cat-legs:#E07A63; --cat-back:#6E98D3; --cat-chest:#DDB04E; --cat-shoulder:#5DB585; --cat-arms:#A88BD1; --cat-core:#9A9893; --cat-other:#7A7873;
     --mat-chrome:rgba(38,38,36,.7); --mat-overlay:rgba(30,30,28,.94);
     --mat-stroke:rgba(255,255,255,.09); --mat-highlight:rgba(255,255,255,.06);
     --shadow-float:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.35);
@@ -224,16 +233,18 @@ body.has-dock .page{padding-bottom:calc(var(--tab-b) + var(--h-bars-dock) + var(
 .pad{padding:var(--s4)}
 .row{position:relative;display:flex;align-items:center;gap:var(--s3);min-height:56px;padding:var(--s3) var(--s4);width:100%;border:0;background:none;text-align:left;transition:background-color var(--dur-1) var(--ease)}
 button.row:active{background:var(--press)}
-.row+.row::before,.row+.setw::before{content:"";position:absolute;top:0;left:var(--s4);right:0;height:1px;background:var(--divider)}
+.row+.row::before{content:"";position:absolute;top:0;left:var(--s4);right:0;height:1px;background:var(--divider)}
 .row-main{flex:1;min-width:0}
 .row-main>*{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .row-end{flex:none;text-align:right}
 .chev{width:16px;height:16px;color:var(--text-3);flex:none}
 
 /* Segmented control */
-.seg{display:flex;background:var(--fill);border-radius:var(--r-sm);padding:2px;gap:2px}
-.seg button{flex:1;min-height:40px;border:0;background:none;border-radius:var(--r-xs);font:500 15px/20px var(--font);color:var(--text-2);padding:0 var(--s2);transition:background-color var(--dur-1) var(--ease),color var(--dur-1) var(--ease)}
-.seg button[aria-pressed="true"]{background:var(--thumb);color:var(--text);font-weight:600;box-shadow:var(--shadow-thumb)}
+/* the track is a recess; the thumb sits on top of it with a soft lift, never a glow */
+.seg{display:flex;background:var(--fill);border-radius:var(--r-sm);padding:3px;gap:2px}
+.seg button{flex:1;min-height:var(--h-control);border:0;background:none;border-radius:var(--r-xs);font:500 15px/20px var(--font);color:var(--text-2);padding:0 var(--s2);transition:background-color var(--dur-1) var(--ease),color var(--dur-1) var(--ease)}
+.seg button:active{color:var(--text)}
+.seg button[aria-pressed="true"]{background:var(--thumb);color:var(--text);font-weight:600;box-shadow:inset 0 0 0 1px var(--control-stroke),var(--shadow-thumb)}
 
 /* Choice grid (category) */
 .choices{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--s2)}
@@ -242,7 +253,8 @@ button.row:active{background:var(--press)}
 .choices button[aria-pressed="true"]{border-color:var(--primary);background:var(--primary-soft);color:var(--primary);font-weight:600}
 
 /* Inputs */
-.field{width:100%;min-height:var(--h-input);border:1px solid transparent;border-radius:var(--r-sm);background:var(--fill);padding:0 var(--s3);font:400 17px/24px var(--font)}
+.field{width:100%;min-height:var(--h-input);border:1px solid transparent;border-radius:var(--r-sm);background:var(--fill);padding:0 var(--s3);font:400 17px/24px var(--font);transition:border-color var(--dur-1) var(--ease),background-color var(--dur-1) var(--ease)}
+.field::placeholder{color:var(--text-3)}
 .field:focus{outline:none;border-color:var(--primary);background:var(--surface)}
 textarea.field{padding:var(--s3);resize:vertical;min-height:96px}
 select.field{appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--text-3) 50%),linear-gradient(135deg,var(--text-3) 50%,transparent 50%);background-position:calc(100% - 20px) 50%,calc(100% - 15px) 50%;background-size:5px 5px;background-repeat:no-repeat;padding-right:var(--s7)}
@@ -250,20 +262,28 @@ select.field{appearance:none;-webkit-appearance:none;background-image:linear-gra
 .fl>.t-label{display:block;color:var(--text-2);margin:0 0 var(--s2) var(--s1)}
 .fl+.fl{margin-top:var(--s5)}
 /* minmax(0,…): otherwise each input's intrinsic width pushes the right column off a phone screen */
-.fgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s4) var(--s3)}
+.fgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s5) var(--s3)}
 .fgrid .fl+.fl{margin-top:0}
-.unitfield{display:flex;align-items:center;background:var(--fill);border-radius:var(--r-sm);border:1px solid transparent;padding-right:var(--s3)}
+.unitfield{display:flex;align-items:center;background:var(--fill);border-radius:var(--r-sm);border:1px solid transparent;padding-right:var(--s3);transition:border-color var(--dur-1) var(--ease),background-color var(--dur-1) var(--ease)}
 .unitfield:focus-within{border-color:var(--primary);background:var(--surface)}
-.unitfield input{flex:1;min-width:0;width:100%;border:0;background:none;height:46px;padding:0 var(--s3);font:600 20px/26px var(--font);font-variant-numeric:tabular-nums}
+.unitfield input{flex:1;min-width:0;width:100%;border:0;background:none;height:var(--h-input);padding:0 var(--s3);font:600 20px/26px var(--font);font-variant-numeric:tabular-nums}
 .unitfield input:focus{outline:none}
 .unitfield input::placeholder{color:var(--text-3);font-weight:400}
 .unitfield span{color:var(--text-3);font:400 15px/20px var(--font)}
-.hint{display:block;margin:var(--s1) 0 0 var(--s1)}
+.hint{display:block;margin:var(--s2) var(--s1) 0;color:var(--text-3)}
+/* form sections inside a sheet sit a little roomier than a plain card */
+.sheet .pad{padding:var(--s5) var(--s4)}
+.sheet .fl>.t-label{margin-bottom:var(--s2)}
+/* the save action closes the sheet: it is spaced away from the fields, with the destructive action quieter beneath it */
+.savebar{display:flex;flex-direction:column;gap:var(--s2);margin-top:var(--s6)}
+/* when the save bar lives inside the form card, one hairline sets it apart and it spans edge to edge */
+.group>.savebar{margin:var(--s5) calc(var(--s4) * -1) 0;padding:var(--s4) var(--s4) 0;border-top:1px solid var(--divider)}
+.savebar .btn-block{margin-top:0}
 
 /* Toggle */
 .toggle{position:relative;width:51px;height:31px;flex:none}
 .toggle input{position:absolute;inset:0;margin:0;opacity:0;cursor:pointer}
-.toggle span{position:absolute;inset:0;border-radius:var(--r-full);background:var(--fill-2);transition:background-color var(--dur-2) var(--ease);pointer-events:none}
+.toggle span{position:absolute;inset:0;border-radius:var(--r-full);background:var(--fill-2);box-shadow:inset 0 0 0 1px var(--control-stroke);transition:background-color var(--dur-2) var(--ease);pointer-events:none}
 .toggle span::after{content:"";position:absolute;left:2px;top:2px;width:27px;height:27px;border-radius:50%;background:var(--knob);box-shadow:var(--shadow-thumb);transition:transform var(--dur-2) var(--ease)}
 .toggle input:checked+span{background:var(--primary)}
 .toggle input:checked+span::after{transform:translateX(20px)}
@@ -282,22 +302,28 @@ select.field{appearance:none;-webkit-appearance:none;background-image:linear-gra
 .dock{height:var(--h-control)}
 .dock[hidden]{display:none}
 .bars[hidden]{display:none}
-.dock-in{position:relative;display:flex;align-items:center;gap:var(--s1);height:100%}
+.dock-in{position:relative;display:flex;align-items:center;gap:var(--s2);height:100%}
 .dock .btn{min-height:var(--h-control);height:var(--h-control);border-radius:var(--r-full)}
-.dock-rest{background:none;color:var(--text);padding:0 var(--s3);font-variant-numeric:tabular-nums}
-.dock-rest:active{background:var(--press)}
-.dock-rest svg{color:var(--text-2)}
-.dock-add{flex:1}
-.timer{position:relative;flex:1;min-width:0;height:100%;display:flex;align-items:center;gap:var(--s1);padding-left:var(--s3);border-radius:var(--r-full);overflow:hidden}
+/* the rest chip is secondary: the primary action beside it is what you press mid-set */
+.dock-rest{background:var(--press);color:var(--text-2);padding:0 var(--s3);font-variant-numeric:tabular-nums;font-weight:500}
+.dock-rest:active{background:var(--fill-2);color:var(--text)}
+.dock-rest svg{width:var(--icon-sm);height:var(--icon-sm);color:var(--text-3)}
+.dock-add{flex:1;padding-left:var(--s4);padding-right:var(--s5)}
+.timer{position:relative;flex:1;min-width:0;height:100%;display:flex;align-items:center;gap:var(--s1);padding-left:var(--s4);border-radius:var(--r-full);overflow:hidden;background:var(--press)}
 .timer>*{position:relative}
 /* remaining time as a quiet fill behind the controls */
 .timer-bar{position:absolute;left:0;top:0;bottom:0;border-radius:inherit;background:color-mix(in srgb,var(--primary) 12%,transparent);transition:width .25s linear}
 .timer-main{flex:1;min-width:0;display:flex;align-items:baseline;gap:var(--s2)}
-.timer-main b{font:600 24px/30px var(--font);font-variant-numeric:tabular-nums;min-width:60px}
+.timer-main b{font:600 24px/30px var(--font);font-variant-numeric:tabular-nums;letter-spacing:-.01em;min-width:60px}
 .timer-main span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.timer .btn{min-width:48px;padding:0 var(--s3);background:var(--press);color:var(--text);font:600 15px/20px var(--font)}
-.timer .btn:active{background:var(--fill-2)}
+/* the countdown is the content; −15/+15 are quiet nudges and the finish button is the one clear control */
+.timer .btn{min-width:var(--h-control);padding:0 var(--s2);border-radius:var(--r-full);background:none;color:var(--text-2);font:500 15px/20px var(--font);font-variant-numeric:tabular-nums}
+.timer .btn:active{background:var(--fill-2);color:var(--text)}
+.timer .dock-stop{min-width:auto;padding:0 var(--s3);background:var(--fill-2);color:var(--text);font-weight:600;margin-right:var(--s1)}
+.timer .dock-stop:active{background:var(--border)}
 .timer.done .timer-main b{color:var(--primary)}
+.timer.done .dock-stop{background:var(--primary);color:var(--on-primary)}
+.timer.done .dock-stop:active{background:var(--primary-press)}
 
 /* Bottom sheet — overlay material, attached to the bottom edge */
 .scrim{position:fixed;inset:0;z-index:20;background:var(--scrim);opacity:0;pointer-events:none;transition:opacity var(--dur-2) var(--ease)}
@@ -309,13 +335,14 @@ select.field{appearance:none;-webkit-appearance:none;background-image:linear-gra
 /* tall: top pinned just below the status bar — the header never moves while results change or the keyboard opens */
 .sheet.tall{top:calc(var(--vvtop,0px) + env(safe-area-inset-top,0px) + var(--s3));max-height:none}
 .sheet.tall .sheet-b{flex:1}
-.sheet-search{flex:1;min-width:0;margin-right:var(--s1)}
-.sheet-search input{-webkit-appearance:none;appearance:none}
+.sheet-search{flex:1;min-width:0;margin-right:var(--s1);padding-left:var(--s3)}
+.sheet-search>span{flex:none;width:var(--icon-sm);height:var(--icon-sm);color:var(--text-3)}
+.sheet-search input{-webkit-appearance:none;appearance:none;font:inherit}
 #sugg>:first-child{margin-top:var(--s2)!important}
 .sheet:not(.open){visibility:hidden;transition:transform var(--dur-3) var(--ease-sheet),visibility 0s var(--dur-3)}
 .sheet.open{transform:none}
 .sheet-top{flex:none;padding-top:var(--s2);touch-action:none}
-.grab{width:36px;height:5px;border-radius:var(--r-full);background:var(--border);margin:0 auto}
+.grab{width:36px;height:5px;border-radius:var(--r-full);background:var(--control-stroke);margin:0 auto}
 .sheet-h{display:flex;align-items:center;justify-content:space-between;padding:var(--s1) var(--s2) var(--s2) var(--s4);min-height:52px}
 /* close: a 32px filled circle inside a 44px touch target */
 .sheet-h .iconbtn{padding:6px;background:var(--fill) content-box;color:var(--text-2)}
@@ -323,6 +350,12 @@ select.field{appearance:none;-webkit-appearance:none;background-image:linear-gra
 .sheet-h .iconbtn:active{background-color:var(--fill-2)}
 .sheet-b{overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:var(--s2) var(--s4) var(--s6)}
 .sheet-b>.group+.group,.sheet-b>.group+.sec-h{margin-top:var(--s6)}
+/* the add-exercise sheet builds its sections inside a live region, so they get the same rhythm here */
+#sugg>.sec{margin-top:var(--s6)}
+#sugg>.sec:first-child{margin-top:var(--s2)}
+#sugg>.choices{margin-top:var(--s4)}
+#sugg>.group{margin-top:var(--s3)}
+#sugg>.note{margin:var(--s6) var(--s1) 0}
 .sheet .group{background:var(--surface-raised)}
 .actions .row{min-height:52px}
 
@@ -331,38 +364,73 @@ select.field{appearance:none;-webkit-appearance:none;background-image:linear-gra
 .dlg.open{opacity:1;pointer-events:auto}
 .dlg-box{width:min(320px,100%);border-radius:var(--r-xl);padding:var(--s6) var(--s5) var(--s5);transform:scale(.97);transition:transform var(--dur-2) var(--ease);--fill:var(--fill-raised);--divider:var(--divider-raised)}
 .dlg.open .dlg-box{transform:none}
-.dlg-acts{display:flex;gap:var(--s2);margin-top:var(--s5)}
-.dlg-acts .btn{flex:1}
+.dlg-box>.t-body{font-weight:500;line-height:1.45;letter-spacing:-.003em}
+.dlg-acts{display:flex;gap:var(--s2);margin-top:var(--s6)}
+.dlg-acts .btn{flex:1;min-height:var(--h-control)}
 
 /* Toast */
-.toast{position:fixed;left:50%;bottom:calc(var(--tab-b) + var(--h-bars) + var(--s3));z-index:30;transform:translate(-50%,8px);width:min(calc(var(--bar-max) - var(--s7)),calc(100% - var(--s7)));min-height:52px;display:flex;align-items:center;justify-content:space-between;gap:var(--s3);padding:0 var(--s2) 0 var(--s5);color:var(--text);border-radius:var(--r-full);opacity:0;pointer-events:none;transition:opacity var(--dur-2) var(--ease),transform var(--dur-2) var(--ease)}
-body.has-dock .toast{bottom:calc(var(--tab-b) + var(--h-bars-dock) + var(--s3))}
+/* keyboard-aware: validation toasts fire while typing, so stay above --kb when it is larger than the panel */
+.toast{position:fixed;left:50%;bottom:calc(max(var(--tab-b) + var(--h-bars),var(--kb,0px)) + var(--s3));z-index:30;transform:translate(-50%,8px);width:min(calc(var(--bar-max) - var(--s7)),calc(100% - var(--s7)));min-height:52px;display:flex;align-items:center;justify-content:space-between;gap:var(--s3);padding:0 var(--s2) 0 var(--s5);color:var(--text);border-radius:var(--r-full);opacity:0;pointer-events:none;transition:opacity var(--dur-2) var(--ease),transform var(--dur-2) var(--ease)}
+body.has-dock .toast{bottom:calc(max(var(--tab-b) + var(--h-bars-dock),var(--kb,0px)) + var(--s3))}
 .toast.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
-.toast button{min-height:var(--h-control);border:0;background:none;border-radius:var(--r-full);color:var(--primary);font:600 15px/20px var(--font);padding:0 var(--s3)}
-.toast button:active{background:var(--press)}
+.toast>.t-callout{min-width:0;padding-right:var(--s1)}
+.toast button{flex:none;min-height:var(--h-control);border:0;background:var(--press);border-radius:var(--r-full);color:var(--primary);font:600 15px/20px var(--font);padding:0 var(--s4)}
+.toast button:active{background:var(--fill-2)}
 
 /* Empty / loading / notice */
-.empty{padding:var(--s8) var(--s4) var(--s6);text-align:center}
-.empty .t-callout{margin-top:var(--s2)}
+/* an empty state is a place, not an error: a quiet mark, a title, one sentence, then the next action */
+.empty{display:flex;flex-direction:column;align-items:center;padding:var(--s7) var(--s5) var(--s5);text-align:center}
+/* the illustration slot: a soft tinted square holding one stroke drawing; the mark says what the screen is for */
+.empty-ic{display:grid;place-items:center;flex:none;width:56px;height:56px;margin-bottom:var(--s4);border-radius:var(--r-lg);background:var(--primary-soft);color:var(--primary)}
+.empty-ic svg{width:26px;height:26px}
+.empty .t-h3,.empty .t-callout{max-width:34ch}
+.empty .t-h3+.t-callout,.empty .t-callout:only-of-type{margin-top:var(--s2)}
+.empty>.btn{margin-top:var(--s5)}
+/* inside a sheet or a tight column the same block sits closer to its neighbours */
+.empty.compact{padding:var(--s5) var(--s3) var(--s2)}
+.empty.compact .empty-ic{width:48px;height:48px;margin-bottom:var(--s3);border-radius:var(--r-md)}
+.empty.compact .empty-ic svg{width:24px;height:24px}
+/* spacing utilities: markup never carries a bare pixel gap */
+.mt-4{margin-top:var(--s4)} .mt-5{margin-top:var(--s5)} .mb-4{margin-bottom:var(--s4)}
+/* trailing add affordance on a pickable row */
+.row-add{flex:none;display:grid;place-items:center;width:28px;height:28px;border-radius:var(--r-full);background:var(--fill);color:var(--primary)}
+.row-add svg{width:var(--icon-xs);height:var(--icon-xs)}
+/* every set of the day is done: one quiet line closes the session, no celebration */
+.finish{display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s4);margin-bottom:var(--s4);background:var(--success-soft);border-radius:var(--r-lg);color:var(--success)}
+.finish>svg{width:var(--icon-sm);height:var(--icon-sm);flex:none}
+.finish p{flex:1;min-width:0}
 .sk{background:var(--fill);border-radius:var(--r-sm);animation:pulse 1.4s ease-in-out infinite}
 @keyframes pulse{50%{opacity:.5}}
-.notice{display:flex;align-items:center;justify-content:space-between;gap:var(--s3);padding:var(--s3) var(--s4);background:var(--warning-soft);color:var(--text)}
+.notice{display:flex;align-items:center;justify-content:space-between;gap:var(--s3);min-height:var(--h-control);padding:var(--s2) var(--s2) var(--s2) var(--s4);background:var(--warning-soft);color:var(--text)}
+/* a notice about something that is wrong with the data, not just overdue */
+.notice.bad{background:var(--error-soft)}
+.notice>.t-callout,.notice>.t-caption{flex:1;min-width:0}
 
 /* =========================================================
    5. SCREEN-SPECIFIC
    ========================================================= */
 /* week strip */
+/* the nav buttons stay in their 32px tracks but their hit area is a full 44px,
+   overflowing into the page gutter on both sides so the day cells are not squeezed */
 .week{display:grid;grid-template-columns:32px repeat(7,minmax(0,1fr)) 32px;align-items:center;margin:0 calc(var(--s2) * -1) var(--s2)}
-.week .wk-nav{width:32px;height:56px;border:0;background:none;color:var(--text-3);display:grid;place-items:center}
+.week .wk-nav{width:var(--h-control);height:var(--h-control);justify-self:center;border:0;background:none;color:var(--text-3);display:grid;place-items:center}
 .week .wk-nav svg{width:var(--icon-xs);height:var(--icon-xs)}
-.day{height:58px;border:0;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0}
+.day{position:relative;height:58px;border:0;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0}
+/* on a 375pt phone each cell is ~42px wide; stretch the hit area 3px past the top and bottom instead of the width */
+.day::after{content:"";position:absolute;inset:-3px 0}
 .day span{font:400 13px/18px var(--font);color:var(--text-3)}
 .day b{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font:500 17px/22px var(--font);font-variant-numeric:tabular-nums;transition:background-color var(--dur-1) var(--ease)}
 .day:active b{background:var(--press)}
-.day i{width:4px;height:4px;border-radius:50%;background:transparent}
-.day.has i{background:var(--text-3)}
-.day.today b{color:var(--primary);font-weight:600}
-.day[aria-current="date"] b{background:var(--primary);color:var(--on-primary);font-weight:600}
+/* a trained day gets a filled dot; a day with a plan but nothing done gets a hollow one */
+.day i{width:5px;height:5px;border-radius:50%;background:transparent;box-shadow:0 0 0 1px transparent}
+.day.has i{background:var(--primary)}
+.day.planned i{box-shadow:inset 0 0 0 1px var(--text-3)}
+.day[aria-current="date"] i{background:var(--on-primary)}
+.day[aria-current="date"].planned i{background:transparent;box-shadow:inset 0 0 0 1px var(--on-primary)}
+/* today is marked with a ring; only the selected day is filled, so the eye has one focus */
+.day.today b{box-shadow:inset 0 0 0 1.5px var(--primary);color:var(--primary);font-weight:600}
+.day[aria-current="date"] b{background:var(--primary);color:var(--on-primary);font-weight:600;box-shadow:none}
+.day[aria-current="date"].today b{box-shadow:none}
 .calbtn input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
 
 /* training calendar (進度) */
@@ -375,45 +443,75 @@ body.has-dock .toast{bottom:calc(var(--tab-b) + var(--h-bars-dock) + var(--s3))}
 .cal-d.on b{background:var(--primary);color:var(--on-primary);font-weight:600}
 button.cal-d:active b{background:var(--primary-press)}
 .cal-d.today:not(.on) b{box-shadow:inset 0 0 0 1.5px var(--primary);color:var(--primary);font-weight:600}
-.cal-d.future{color:var(--disabled)}
+.cal-d.future{color:var(--text-3)}
 
 /* exercise block */
 .exs{margin-top:var(--s4)}
-.exs-h{display:flex;align-items:flex-start;gap:var(--s2);padding:var(--s4) var(--s2) 0 var(--s4)}
+.exs-h{display:flex;align-items:center;gap:var(--s2);padding:var(--s4) var(--s2) 0 var(--s4)}
 .exs-h .row-main{padding-top:var(--s1)}
+/* progress through this exercise's sets: the number you care about while lifting */
+.exs-count{flex:none;display:flex;align-items:baseline;font-variant-numeric:tabular-nums;color:var(--text-2);margin-right:calc(var(--s2) * -1)}
+.exs-count b{font-weight:600;color:var(--text)}
+.exs.complete .exs-count b{color:var(--primary)}
 .exs-meta{padding:var(--s1) var(--s4) 0}
 .exs-meta p+p{margin-top:2px}
 .st-h,.set{display:grid;grid-template-columns:28px minmax(0,1.25fr) minmax(0,1fr) 44px;gap:var(--s2);align-items:center}
-.st-h{padding:var(--s4) var(--s4) var(--s1)}
+/* the column header appears once per exercise and is quiet: 13px + --text-3, never an opacity fade */
+.st-h{padding:var(--s3) var(--s4) var(--s1)}
 .st-h span:last-child{text-align:center}
+/* cards after the first skip the repeated header; a hairline keeps the list edges legible */
+.st-sep{height:1px;background:var(--divider);margin-top:var(--s2)}
 .setw{position:relative;overflow:hidden}
-.setw .del{position:absolute;right:0;top:0;bottom:0;width:88px;border:0;background:var(--error);color:var(--on-error);font:600 15px/20px var(--font)}
+/* sets in one exercise are one list: a hairline between rows instead of a fill that disappears when done */
+.setw+.setw::before{content:"";position:absolute;top:0;left:var(--s4);right:0;height:1px;background:var(--divider);z-index:1}
+.setw .del{position:absolute;right:0;top:0;bottom:0;width:var(--set-del-w);border:0;background:var(--error);color:var(--on-error);font:600 15px/20px var(--font)}
 .set{position:relative;touch-action:pan-y;background:var(--surface);padding:var(--s1) var(--s4);transition:transform var(--dur-2) var(--ease-sheet)}
-.set.open{transform:translateX(-88px)}
+.set.open{transform:translateX(calc(var(--set-del-w) * -1))}
+/* done sets recede so the next set to do is what the eye lands on; their numbers stay legible */
+.set.done .nf{background:transparent}
+.set.done .nf input{color:var(--text-2)}
+.set.done .unit{text-decoration-color:transparent}
 .idx{font:400 15px/20px var(--font);font-variant-numeric:tabular-nums;color:var(--text-3);text-align:center}
 .idx.pr{color:var(--warning);font-weight:600;font-size:13px}
+/* the working set is marked by shape — a ring around the whole row and a heavier number — not by the accent alone,
+   so it never reads as the same signal as a done set's filled circle */
+.set.next::after{content:"";position:absolute;inset:0;border-radius:var(--r-sm);box-shadow:inset 0 0 0 1.5px var(--primary);pointer-events:none}
+.set.next .idx{color:var(--text);font-weight:600}
 .nf{display:flex;align-items:center;height:var(--h-control);border-radius:var(--r-sm);background:var(--fill);min-width:0;transition:background-color var(--dur-1) var(--ease)}
 .nf:focus-within{background:var(--surface);box-shadow:inset 0 0 0 2px var(--primary)}
 .nf input{flex:1;min-width:0;width:100%;height:var(--h-control);border:0;background:none;padding:0 0 0 var(--s3);font:600 20px/26px var(--font);font-variant-numeric:tabular-nums}
 .nf input:focus{outline:none}
 .nf input::placeholder{color:var(--text-3);font-weight:400}
-.unit{flex:none;height:var(--h-control);min-width:40px;border:0;background:none;padding:0 var(--s2) 0 var(--s1);font:500 15px/20px var(--font);color:var(--text-3);text-decoration:underline dotted;text-underline-offset:4px;text-decoration-color:var(--border)}
+.unit{flex:none;height:var(--h-control);min-width:var(--h-control);border:0;background:none;padding:0 var(--s2) 0 var(--s1);font:500 15px/20px var(--font);color:var(--text-3);text-decoration:underline dotted;text-underline-offset:4px;text-decoration-color:var(--border)}
 .unit.lb{color:var(--text)}
 .chk{width:var(--h-control);height:var(--h-control);border:0;background:none;display:grid;place-items:center;padding:0}
-.chk span{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);display:grid;place-items:center;color:var(--on-primary);transition:background-color var(--dur-1) var(--ease),border-color var(--dur-1) var(--ease),transform var(--dur-1) var(--ease)}
+.chk span{width:28px;height:28px;border-radius:50%;border:2px solid var(--control-stroke);display:grid;place-items:center;color:var(--on-primary);transition:background-color var(--dur-1) var(--ease),border-color var(--dur-1) var(--ease),transform var(--dur-1) var(--ease)}
 .chk svg{width:16px;height:16px}
 .set.done .chk span{background:var(--primary);border-color:var(--primary)}
 .chk:active span{transform:scale(.9)}
-.eff{grid-column:2/4;display:flex;align-items:center;justify-content:space-between;gap:var(--s2);min-height:28px;margin-top:-2px}
-.eff button{border:0;background:none;color:var(--primary);font:500 13px/18px var(--font);min-height:28px;padding:0 var(--s1)}
+.eff{grid-column:2/4;display:flex;align-items:center;justify-content:space-between;gap:var(--s2);margin-top:-2px}
+.eff button{border:0;background:none;color:var(--primary);font:500 13px/18px var(--font);min-height:var(--h-control);padding:0 var(--s1)}
 .exs-f{padding:var(--s1) var(--s2) var(--s2)}
 .exs-f .btn-plain{gap:var(--s1)}
 .exs-f svg{width:var(--icon-xs);height:var(--icon-xs)}
-.notice .btn-plain{min-height:36px;flex:none}
+.notice .btn-plain{min-height:var(--h-control);flex:none}
 
 /* 進度: exercises grouped by category */
 .cat-h{display:flex;align-items:baseline;gap:var(--s2);margin:0;padding:var(--s4) var(--s1) var(--s2);color:var(--text-2)}
 .sec-h+.cat-h{padding-top:var(--s1)}
+/* chart legend: small color mark + label, one line that wraps cleanly */
+.cat-legend{display:flex;flex-wrap:wrap;gap:var(--s1) var(--s4);margin-top:var(--s3)}
+.cat-legend span{display:inline-flex;align-items:center;gap:6px;color:var(--text-2)}
+.cat-legend i{width:8px;height:8px;border-radius:2px;flex:none}
+/* line legend for charts that mix a solid and a dashed series */
+.cat-legend i.ln{width:14px;height:0;border-radius:0;border-top:2px solid var(--primary)}
+.cat-legend i.ln.dash{border-top-style:dashed;border-top-color:var(--warning)}
+/* change since last time; direction is carried by the glyph, not colour alone.
+   Typography and the unit come from .t-caption / U() at the call site, never from this class */
+.delta{font-weight:500;font-variant-numeric:tabular-nums}
+.delta.up{color:var(--success)}
+.delta.down{color:var(--error)}
+.delta.flat{color:var(--text-3)}
 
 /* swipe back: the page follows the finger; a snapshot of the previous page sits underneath, dimmed until revealed */
 .swipe-under{position:fixed;inset:0;z-index:1;overflow:hidden;background:var(--bg);padding-top:env(safe-area-inset-top,0px);pointer-events:none;transform:translateX(-30%)}
@@ -427,6 +525,9 @@ button.cal-d:active b{background:var(--primary-press)}
 .stats .t-h2{margin:var(--s1) 0 2px;white-space:nowrap}
 .cw{position:relative;height:200px}
 .metric-v{display:flex;align-items:baseline;gap:var(--s1);margin-top:var(--s1)}
+/* the one number this screen is about, larger than any title */
+.metric-n{font:700 var(--t-metric)/calc(var(--t-metric) + 4px) var(--font);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.metric-meta{margin-top:var(--s2)}
 .btn-row{display:flex;gap:var(--s2)}
 .btn-row .btn{flex:1}
 
@@ -496,7 +597,7 @@ const IC={
    STATE & STORAGE
    ========================================================= */
 let S={meta:{height:null,unit:'kg',rest:90,autoRest:false,exercises:{}},sessions:{},body:{}};
-let ui={tab:'train',date:todayStr(),range:90,calMonth:todayStr().slice(0,7),prog:null,lastEx:null,newCat:null,newUnit:'kg',newLoad:'single',addCat:null,creating:false,edit:null};
+let ui={tab:'train',date:todayStr(),range:90,calMonth:todayStr().slice(0,7),prog:null,lastEx:null,newCat:null,newUnit:'kg',newLoad:'single',addCat:null,creating:false,edit:null,allLog:false,allBody:false};
 let store=null;
 
 async function initStore(){
@@ -612,6 +713,14 @@ function placeholder(it,j,d){
   const s=last.sets[j]||last.sets[last.sets.length-1];return {w:s.w,r:s.r,u:s.u||'kg',add:s.add};
 }
 const effTxt=(ek,x)=>x&&x.w==null?'–':ek==null?'需要體重紀錄':`${showW(ek)} ${U()}`;
+const NB=' ';   /* number + unit never split across lines */
+/* change of an exercise's top set since the time before it: flat reads "± 持平", never "▼ 0" */
+const deltaTag=dv=>{
+  if(dv==null)return '';
+  if(Math.abs(dv)<.05)return `<span class="delta flat">　± 持平</span>`;
+  const v=`${showW(Math.abs(dv))}${NB}${U()}`;
+  return dv>0?`<span class="delta up">　▲${NB}${v}</span>`:`<span class="delta down">　▼${NB}${v}</span>`;
+};
 
 /* body */
 const isMass=k=>BODY_FIELDS.find(f=>f[0]===k)[2]==='mass';
@@ -713,10 +822,12 @@ function header(title,sub,actions=''){
    ========================================================= */
 function summaryText(d,st){
   const t=todayStr();
-  const date=d===t?`${mdLong(d)} 週${wd(d)}`:`週${wd(d)}`;
-  if(st.sets)return `${date}　${st.ex} 個動作　${st.sets} 組　${volTxt(st.vol)}`;
-  if(st.planned)return `${date}　還沒有完成的組`;
-  return date;
+  /* the big title already names today / yesterday; the subtitle only repeats a date on other days */
+  const date=d===t?'':d===addDays(t,-1)?'':`${mdLong(d)} 週${wd(d)}`;
+  const lead=date?`${date}　`:'';
+  if(st.sets)return `${lead}${st.ex} 個動作・${st.sets} 組・${volTxt(st.vol)}`;
+  if(st.planned)return `${lead}還沒有完成的組`;
+  return '';   /* empty day: the empty-state block already says it, so no subtitle */
 }
 function renderTrain(){
   const d=ui.date,t=todayStr(),s=S.sessions[d]||{date:d,items:[]},st=sessionStats(s);
@@ -725,38 +836,49 @@ function renderTrain(){
   const actions=`${d!==t?`<button class="btn btn-plain" data-act="today">今天</button>`:''}
     <span class="iconbtn calbtn" aria-label="選擇日期">${IC.cal}<input type="date" id="dateIn" value="${d}" required aria-label="選擇日期"></span>`;
   const recent=allExercises().filter(n=>!s.items.some(i=>i.name===n)).slice(0,6);
+  /* nothing left to lift today: say it once, quietly, where the eye already is */
+  const allDone=s.items.length>0&&s.items.every(it=>it.sets.length&&it.sets.every(isDone));
   app.innerHTML=`${header(title,summaryText(d,st),actions)}
   <div class="week" role="group" aria-label="選擇日期">
     <button class="wk-nav" data-act="week" data-n="-7" aria-label="上一週">${IC.chevL}</button>
-    ${days.map(x=>`<button class="day ${S.sessions[x]?.items?.length?'has':''} ${x===t?'today':''}" data-act="pick" data-d="${x}" ${x===d?'aria-current="date"':''} aria-label="${mdLong(x)} 週${wd(x)}"><span>${wd(x)}</span><b>${+x.slice(8)}</b><i></i></button>`).join('')}
+    ${days.map(x=>{const ss=S.sessions[x],done=!!ss&&ss.items.some(it=>it.sets.some(isDone)),planned=!!ss&&ss.items.length>0;
+      return `<button class="day ${done?'has':planned?'planned':''} ${x===t?'today':''}" data-act="pick" data-d="${x}" ${x===d?'aria-current="date"':''} aria-label="${mdLong(x)} 週${wd(x)}${done?'，有完成的組':planned?'，有安排但還沒完成':''}"><span>${wd(x)}</span><b>${+x.slice(8)}</b><i></i></button>`}).join('')}
     <button class="wk-nav" data-act="week" data-n="7" aria-label="下一週">${IC.chevR}</button>
   </div>
-  ${s.items.length?s.items.map((it,i)=>exBlock(it,i,d)).join(''):`
-    <div class="empty"><p class="t-h3">${d===t?'今天還沒有動作':'這天沒有訓練紀錄'}</p><p class="t-callout c2">按下方「新增動作」開始，上次的重量會自動帶出來當參考。</p></div>
-    ${recent.length?`<section class="sec" style="margin-top:0"><div class="sec-h"><h2 class="t-h3">最近做過</h2></div><div class="group">${recent.map(n=>{const l=lastBefore(n,addDays(t,1));
-      return `<button class="row" data-act="pickex" data-name="${esc(n)}"><div class="row-main"><p class="t-body">${esc(n)}</p><p class="t-caption c2">${l?`${md(l.date)}　${esc(setsText(l.sets.slice(0,4),n))}`:esc(catOf(n))}</p></div><span class="c3" style="width:20px;height:20px">${IC.plus}</span></button>`}).join('')}</div></section>`:''}`}`;
+  ${allDone?`<div class="finish">${IC.check}<p class="t-callout"><b class="num">${st.sets}</b> 組都完成了</p><span class="t-label num c2">${volTxt(st.vol)}</span></div>`:''}
+  ${s.items.length?s.items.map((it,i)=>exBlock(it,i,d,i===0)).join(''):`
+    <div class="empty"><span class="empty-ic" aria-hidden="true">${IC.tTrain}</span><p class="t-h3">${d===t?'今天還沒有動作':'這天沒有訓練紀錄'}</p><p class="t-callout c2">按下方「新增動作」開始，上次的重量會自動帶出來當參考。</p></div>
+    ${recent.length?`<section class="sec" style="margin-top:0"><div class="sec-h"><h2 class="t-h3">最近做過</h2><span class="t-caption c3">點一下加入</span></div><div class="group">${recent.map(n=>{const l=lastBefore(n,addDays(t,1));
+      return `<button class="row" data-act="pickex" data-name="${esc(n)}"><div class="row-main"><p class="t-body">${esc(n)}</p><p class="t-caption c2">${l?`${md(l.date)}　${esc(setsText(l.sets.slice(0,4),n))}`:esc(catOf(n))}</p></div><span class="row-add" aria-hidden="true">${IC.plus}</span></button>`}).join('')}</div></section>`:''}`}`;
   $('#dateIn').addEventListener('change',e=>{if(e.target.value){ui.date=e.target.value;render()}else e.target.value=ui.date});
 }
-function exBlock(it,i,d){
+/* first: the column header is printed once per screen, not once per card */
+function exBlock(it,i,d,first){
   const n=it.name, lt=loadType(n), as=lt==='assist', last=lastBefore(n,d), pm=maxBefore(n,d), bw=as?bwOn(d):null;
   const note=(S.meta.exercises[n]?.note||'').replace(/\s*\n\s*/g,'；');
-  const meta=last?`上次 ${md(last.date)}　${setsText(last.sets,n)}`:'第一次做這個動作';
-  return `<section class="exs group" data-i="${i}" aria-label="${esc(n)}">
-    <div class="exs-h"><div class="row-main"><h2 class="t-h2">${esc(n)}</h2></div>
+  /* the weight/reps are already shown as grey placeholders in the fields; repeating them here costs a line */
+  const meta=last?`上次 ${md(last.date)}`:'';
+  const nextIdx=it.sets.findIndex(x=>!isDone(x));
+  const doneCount=it.sets.filter(isDone).length;
+  /* "2 / 3" is the one bit of progress worth showing at a glance; a 1-set exercise skips it */
+  const target=it.sets.length>1?`<span class="exs-count t-callout"><b class="num">${doneCount}</b><span class="c3"> / ${it.sets.length}</span></span>`:'';
+  return `<section class="exs group ${doneCount===it.sets.length&&doneCount>0?'complete':''}" data-i="${i}" data-first="${first?1:0}" aria-label="${esc(n)}">
+    <div class="exs-h"><div class="row-main"><h2 class="t-h2">${esc(n)}</h2></div>${target}
       <button class="iconbtn" data-act="exmenu" aria-label="${esc(n)} 更多動作">${IC.more}</button></div>
-    <div class="exs-meta"><p class="t-callout c2">${esc(meta)}</p>${note?`<p class="t-caption c3">${esc(note)}</p>`:''}</div>
-    ${as&&bw==null?`<div class="notice" style="margin-top:12px"><span class="t-caption">需要體重紀錄才能算出實際負荷</span><button class="btn btn-plain" data-act="gobody">記錄體重</button></div>`:''}
-    <div class="st-h t-label c3" aria-hidden="true"><span></span><span>${lt==='double'?'重量（單邊）':as?'輔助重量':'重量'}</span><span>次數</span><span>完成</span></div>
-    ${it.sets.map((x,j)=>setRow(it,x,j,d,pm,as)).join('')}
-    <div class="exs-f"><button class="btn btn-plain" data-act="addset">${IC.plus}新增一組</button></div>
+    ${meta||note?`<div class="exs-meta"><p class="t-callout c2">${esc(meta)}</p>${note?`<p class="t-caption c3">${esc(note)}</p>`:''}</div>`:''}
+    ${as&&bw==null?`<div class="notice" style="margin-top:var(--s3)"><span class="t-caption">需要體重紀錄才能算出實際負荷</span><button class="btn btn-plain" data-act="gobody">記錄體重</button></div>`:''}
+    ${first?`<div class="st-h t-label c3" aria-hidden="true"><span></span><span>${lt==='double'?'重量（單邊）':as?'輔助重量':'重量'}</span><span>次數</span><span>完成</span></div>`
+      :`<div class="st-sep" aria-hidden="true"></div>`}
+    ${it.sets.map((x,j)=>setRow(it,x,j,d,pm,as,nextIdx)).join('')}
+    <div class="exs-f"><button class="btn btn-plain" data-act="addset">${IC.plus}${it.sets.some(x=>isDone(x))?'新增一組':'開始第一組'}</button></div>
   </section>`;
 }
-function setRow(it,x,j,d,pm,as){
+function setRow(it,x,j,d,pm,as,nextIdx){
   const ph=placeholder(it,j,d), ek=effKg(it.name,x,d), pr=isDone(x)&&pm>0&&ek!=null&&ek>pm+1e-6;
   const phW=ph&&ph.w!=null?fmt((ph.u||'kg')===(x.u||'kg')?ph.w:r1(fromKg(toKg(ph.w,ph.u),x.u||'kg'))):'0';
   const phR=ph&&ph.r?ph.r:'0';
   return `<div class="setw" data-j="${j}"><button class="del" data-act="delset" tabindex="-1">刪除</button>
-    <div class="set ${x.done?'done':''}">
+    <div class="set ${x.done?'done':''} ${j===nextIdx?'next':''}">
       <span class="idx ${pr?'pr':''}" aria-label="${pr?'個人紀錄':''}">${pr?'PR':j+1}</span>
       <div class="nf"><input inputmode="decimal" enterkeyhint="next" data-f="w" value="${x.w??''}" placeholder="${phW}" aria-label="第 ${j+1} 組重量"><button class="unit ${x.u==='lb'?'lb':''}" data-act="setunit" aria-label="單位 ${x.u||'kg'}，點一下切換">${x.u||'kg'}</button></div>
       <div class="nf"><input inputmode="numeric" enterkeyhint="done" data-f="r" value="${x.r??''}" placeholder="${phR}" aria-label="第 ${j+1} 組次數"></div>
@@ -834,7 +956,7 @@ function addSearch(){
 function openAdd(){
   ui.newCat=null;ui.newUnit=U();ui.newLoad='single';ui.addCat=null;ui.creating=false;
   /* type=search and no "名稱" wording: iOS otherwise guesses a name field and offers 自動填寫聯絡人 */
-  const head=`<label class="unitfield sheet-search" style="padding-left:12px"><span style="width:20px;height:20px;color:var(--text-3)">${IC.search}</span><input id="q" type="search" name="exercise-search" placeholder="搜尋或新增動作" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" aria-label="搜尋或新增動作" style="font:400 17px/24px var(--font)"></label>`;
+  const head=`<label class="unitfield sheet-search"><span>${IC.search}</span><input id="q" type="search" name="exercise-search" placeholder="搜尋或新增動作" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" aria-label="搜尋或新增動作"></label>`;
   openSheet('新增動作',`<div id="sugg"></div>`,sh=>{
       const q=$('#q');
       /* like iOS search: dragging the results hides the keyboard so the whole list is reachable */
@@ -864,10 +986,10 @@ function drawSugg(){
   if(!q){
     /* browse: category filter, then 最近做過 + one list per category */
     const all=allExercises().filter(n=>!used.has(n)), groups=groupByCat(all);
-    if(!all.length){$('#sugg').innerHTML=`<div class="empty"><p class="t-callout c2">${used.size?'動作庫裡的動作都已經在今天的清單裡。輸入名稱可以建立新動作。':'輸入第一個動作的名稱，例如「臥推」或「腿推機」。'}</p></div>`;return}
+    if(!all.length){$('#sugg').innerHTML=`<div class="empty compact"><span class="empty-ic" aria-hidden="true">${IC.plus}</span><p class="t-callout c2">${used.size?'動作庫裡的動作都已經在今天的清單裡。輸入名稱可以建立新動作。':'輸入第一個動作的名稱，例如「臥推」或「腿推機」。'}</p></div>`;return}
     if(ui.addCat&&!groups.some(([c])=>c===ui.addCat))ui.addCat=null;
-    if(groups.length>1)h+=`<div class="choices" role="group" aria-label="依部位篩選" style="margin-top:16px">${[[null,'全部'],...groups.map(([c])=>[c,c])].map(([c,l])=>`<button data-act="addcat" data-c="${c??''}" aria-pressed="${ui.addCat===c}">${l}</button>`).join('')}</div>`;
-    const sec=(title,names)=>`<div class="sec" style="margin-top:24px"><div class="sec-h"><h3 class="t-h3">${title}</h3><span class="t-caption c3">${names.length}</span></div><div class="group">${names.map(exPickRow).join('')}</div></div>`;
+    if(groups.length>1)h+=`<div class="choices" role="group" aria-label="依部位篩選">${[[null,'全部'],...groups.map(([c])=>[c,c])].map(([c,l])=>`<button data-act="addcat" data-c="${c??''}" aria-pressed="${ui.addCat===c}">${l}</button>`).join('')}</div>`;
+    const sec=(title,names)=>`<div class="sec"><div class="sec-h"><h3 class="t-h3">${title}</h3><span class="t-caption c3">${names.length}</span></div><div class="group">${names.map(exPickRow).join('')}</div></div>`;
     if(ui.addCat)h+=sec(esc(ui.addCat),groups.find(([c])=>c===ui.addCat)[1]);
     else{
       const recent=all.filter(n=>lastBefore(n,addDays(todayStr(),1))).slice(0,5);
@@ -877,19 +999,19 @@ function drawSugg(){
     $('#sugg').innerHTML=h;return;
   }
   /* search: matches first, creating a new exercise comes after */
-  if(hit.length)h+=`<div class="sec" style="margin-top:24px"><div class="sec-h"><h3 class="t-h3">符合的動作</h3><span class="t-caption c3">${hit.length}</span></div><div class="group">${hit.map(exPickRow).join('')}</div></div>`;
-  if(used.has(q))h+=`<p class="t-callout c2" style="margin:24px 4px 0">「${esc(q)}」已經在今天的清單裡。</p>`;
-  else if(!exists&&!hit.length&&!ui.creating)h+=`<p class="t-callout c2" style="margin:24px 4px 0">動作庫裡沒有符合「${esc(q)}」的動作。</p>`;
+  if(hit.length)h+=`<div class="sec"><div class="sec-h"><h3 class="t-h3">符合的動作</h3><span class="t-caption c3">${hit.length}</span></div><div class="group">${hit.map(exPickRow).join('')}</div></div>`;
+  if(used.has(q))h+=`<p class="t-callout c2 note">「${esc(q)}」已經在今天的清單裡。</p>`;
+  else if(!exists&&!hit.length&&!ui.creating)h+=`<p class="t-callout c2 note">動作庫裡沒有符合「${esc(q)}」的動作。</p>`;
   if(!exists&&!ui.creating){
-    h+=`<div class="group" style="margin-top:12px"><button class="row" data-act="creating"><span style="width:20px;height:20px;color:var(--primary)">${IC.plus}</span><span class="row-main t-body" style="color:var(--primary)">建立新動作「${esc(q)}」</span></button></div>`;
+    h+=`<div class="group" style="margin-top:var(--s3)"><button class="row" data-act="creating"><span style="width:20px;height:20px;color:var(--primary)">${IC.plus}</span><span class="row-main t-body" style="color:var(--primary)">建立新動作「${esc(q)}」</span></button></div>`;
   }
   if(!exists&&ui.creating){
-    h+=`<div class="sec" style="margin-top:24px"><div class="sec-h"><h3 class="t-h3">建立「${esc(q)}」</h3></div><div class="group pad">
+    h+=`<div class="sec"><div class="sec-h"><h3 class="t-h3">建立「${esc(q)}」</h3></div><div class="group pad">
       <div class="fl"><span class="t-label">部位</span><div class="choices">${CATS.map(c=>`<button data-act="ncat" data-c="${c}" aria-pressed="${ui.newCat===c}">${c}</button>`).join('')}</div></div>
       <div class="fl"><span class="t-label">重量計算</span><div class="seg">${LOADS.map(([v,l])=>`<button data-act="nload" data-v="${v}" aria-pressed="${ui.newLoad===v}">${l}</button>`).join('')}</div>
         <span class="hint t-caption c3">${ui.newLoad==='double'?'輸入單邊或單支啞鈴重量，訓練量自動乘 2。':ui.newLoad==='assist'?'輸入機器輔助重量，實際負荷＝體重－輔助。':'輸入實際使用的重量。'}</span></div>
       <div class="fl"><span class="t-label">預設單位</span><div class="seg">${['kg','lb'].map(u=>`<button data-act="nunit" data-u="${u}" aria-pressed="${ui.newUnit===u}">${u}</button>`).join('')}</div></div>
-      <button class="btn btn-primary btn-block" style="margin-top:24px" data-act="addnew" ${ui.newCat?'':'disabled'}>${ui.newCat?'加入今天的訓練':'選擇部位後加入'}</button>
+      <div class="savebar"><button class="btn btn-primary btn-block" data-act="addnew" ${ui.newCat?'':'disabled'}>${ui.newCat?'加入今天的訓練':'選擇部位後加入'}</button></div>
     </div></div>`;
   }
   $('#sugg').innerHTML=h;
@@ -910,9 +1032,9 @@ function openExEdit(name){
       <label class="fl"><span class="t-label">組間休息</span><select id="eRest" class="field"><option value="">使用預設（${fmtSec(S.meta.rest||90)}）</option>${REST_OPTS.map(s=>`<option value="${s}" ${e.rest===s?'selected':''}>${fmtSec(s)}</option>`).join('')}</select></label>
       <label class="fl"><span class="t-label">備註</span><textarea id="eNote" class="field" rows="3" placeholder="座椅高度、插銷位置、握法…">${esc(e.note||'')}</textarea></label>
     </div>
-    <p class="t-caption c3" style="margin:12px 4px 0">共 ${c} 天的紀錄，改名會一併更新。</p>
-    <button class="btn btn-primary btn-block" style="margin-top:24px" data-act="saveex">儲存</button>
-    <button class="btn btn-destructive btn-block" style="margin-top:8px" data-act="delexdb">刪除這個動作</button>`);
+    <p class="t-caption c3" style="margin:var(--s3) var(--s1) 0">共 ${c} 天的紀錄，改名會一併更新。</p>
+    <div class="savebar"><button class="btn btn-primary btn-block" data-act="saveex">儲存</button>
+    <button class="btn btn-destructive btn-block" data-act="delexdb">刪除這個動作</button></div>`);
 }
 function saveExEdit(){
   const orig=ui.edit.orig, nn=$('#eName').value.trim();
@@ -938,10 +1060,10 @@ async function delExDb(){
 }
 function openLib(){
   const names=allExercises();
-  openSheet('動作庫',names.length?`<p class="t-callout c2" style="margin:0 4px">建立過的動作都在這裡，下次新增時可以直接選。點一下可以修改部位。</p>${groupByCat(names).map(([cat,ns])=>
-    `<div class="sec" style="margin-top:24px"><div class="sec-h"><h3 class="t-h3">${esc(cat)}</h3><span class="t-caption c3">${ns.length}</span></div><div class="group">${ns.map(n=>{const c=useCount(n);
+  openSheet('動作庫',names.length?`<p class="t-callout c2" style="margin:0 var(--s1)">建立過的動作都在這裡，下次新增時可以直接選。點一下可以修改部位。</p>${groupByCat(names).map(([cat,ns])=>
+    `<div class="sec"><div class="sec-h"><h3 class="t-h3">${esc(cat)}</h3><span class="t-caption c3">${ns.length}</span></div><div class="group">${ns.map(n=>{const c=useCount(n);
     return `<button class="row" data-act="editex" data-name="${esc(n)}"><div class="row-main"><p class="t-body">${esc(n)}</p><p class="t-caption c2">${LOADS.find(l=>l[0]===loadType(n))[1]}　${c} 天</p></div><span class="chev">${IC.chevR}</span></button>`}).join('')}</div></div>`).join('')}`
-  :`<div class="empty"><p class="t-callout c2">還沒有動作。在訓練頁按「新增動作」建立。</p></div>`);
+  :`<div class="empty"><span class="empty-ic" aria-hidden="true">${IC.tTrain}</span><p class="t-h3">還沒有動作</p><p class="t-callout c2">在訓練頁按「新增動作」建立，之後這裡會列出你建立過的所有動作。</p></div>`);
 }
 
 /* =========================================================
@@ -951,9 +1073,9 @@ const RT={on:false,done:false,end:0,dur:0,iv:null,ac:null,doneT:null,label:''};
 function dockHTML(){
   if(RT.on)return `<div class="dock-in"><div class="timer ${RT.done?'done':''}" role="timer" aria-label="組間休息"><div class="timer-bar" id="rtBar"></div>
     <div class="timer-main"><b id="rtTime">0:00</b><span class="t-caption c2" id="rtLbl"></span></div>
-    <button class="btn" data-act="rt" data-n="-15" aria-label="減少 15 秒">−15</button>
-    <button class="btn" data-act="rt" data-n="15" aria-label="增加 15 秒">+15</button>
-    <button class="btn" data-act="rtstop">${RT.done?'關閉':'結束'}</button></div></div>`;
+    <button class="btn dock-adj" data-act="rt" data-n="-15" aria-label="減少 15 秒">−15</button>
+    <button class="btn dock-adj" data-act="rt" data-n="15" aria-label="增加 15 秒">+15</button>
+    <button class="btn dock-stop" data-act="rtstop">${RT.done?'關閉':'結束'}</button></div></div>`;
   if(ui.tab!=='train')return '';
   return `<div class="dock-in"><button class="btn dock-rest" data-act="reststart" aria-label="開始組間休息">${IC.timer}${fmtSec(restFor(ui.lastEx))}</button>
     <button class="btn btn-primary dock-add" data-act="openadd">${IC.plus}新增動作</button></div>`;
@@ -1030,7 +1152,7 @@ function renderProg(){
   if(ui.prog&&allExercises().includes(ui.prog))return renderProgDetail();
   ui.prog=null;
   const dates=sessionDates().filter(inRange), names=allExercises().filter(n=>exHistory(n).length);
-  if(!sessionDates().length){app.innerHTML=`${header('進度')}<div class="empty"><p class="t-h3">還沒有完成的訓練</p><p class="t-callout c2">完成第一組後，這裡會開始累積每個動作的進度。</p></div>`;return}
+  if(!sessionDates().length){app.innerHTML=`${header('進度')}<div class="empty"><span class="empty-ic" aria-hidden="true">${IC.tProg}</span><p class="t-h3">還沒有完成的訓練</p><p class="t-callout c2">完成第一組後，這裡會開始累積每個動作的進度。</p></div>`;return}
   const weeks={};
   dates.forEach(d=>{const k=weekKey(d);weeks[k]=weeks[k]||{n:0,cat:{}};weeks[k].n++;
     S.sessions[d].items.forEach(it=>{const c=catOf(it.name);weeks[k].cat[c]=(weeks[k].cat[c]||0)+itemVol(it,d)})});
@@ -1040,18 +1162,22 @@ function renderProg(){
   ${backupNotice()}
   ${calendar()}
   <div style="margin-top:var(--s7)">${rangeSeg()}</div>
-  <section class="sec" style="margin-top:24px"><div class="sec-h"><h2 class="t-h3">每週訓練量</h2><span class="t-caption c2">${U()}</span></div>
+  <section class="sec"><div class="sec-h"><h2 class="t-h3">每週訓練量</h2><span class="t-caption c2">${U()}</span></div>
     <div class="group pad">${dates.length?`<p class="t-callout c2">${dates.length} 次訓練　平均每週 ${fmt(dates.length/Math.max(1,wk.length))} 次　共 ${volTxt(total)}</p>
-      <div class="cw" style="margin-top:16px"><canvas id="cWk" aria-label="每週訓練量長條圖"></canvas></div>
-      <p class="t-caption c2" style="margin-top:12px;display:flex;flex-wrap:wrap;gap:4px 16px">${used.map(c=>`<span style="display:inline-flex;align-items:center;gap:6px"><i style="width:8px;height:8px;border-radius:2px;background:${catColor(c)}"></i>${c}</span>`).join('')}</p>`
+      <div class="cw mt-4"><canvas id="cWk" aria-label="每週訓練量長條圖"></canvas></div>
+      <p class="cat-legend">${used.map(c=>`<span class="t-caption"><i style="background:${catColor(c)}"></i>${c}</span>`).join('')}</p>`
       :`<p class="t-callout c2">這段期間沒有訓練。</p>`}</div></section>
   <section class="sec"><div class="sec-h"><h2 class="t-h3">動作</h2><span class="t-caption c2">最近一次的最重組</span></div>
     ${groupByCat(names).map(([cat,ns])=>`<h3 class="cat-h t-label">${esc(cat)}<span class="c3 num">${ns.length}</span></h3><div class="group">${ns.map(n=>{const h=exHistory(n),l=h[h.length-1],p=h[h.length-2],dv=p?l.top-p.top:0;
-      return `<button class="row" data-act="progex" data-name="${esc(n)}"><div class="row-main"><p class="t-body">${esc(n)}</p><p class="t-caption c2">${md(l.date)}　${h.length} 次</p></div>
-        <div class="row-end"><p class="t-callout num">${showW(l.top)} ${U()}</p>${p&&Math.abs(dv)>.01?`<p class="t-caption num ${dv>0?'good':'c3'}">${dv>0?'+':'−'}${showW(Math.abs(dv))}</p>`:''}</div><span class="chev">${IC.chevR}</span></button>`}).join('')}</div>`).join('')}</section>
-  <section class="sec"><div class="sec-h"><h2 class="t-h3">訓練紀錄</h2></div>
-    <div class="group">${(dates.length?dates:sessionDates()).slice().reverse().slice(0,30).map(d=>{const s=S.sessions[d],st=sessionStats(s);
-      return `<button class="row" data-act="openday" data-d="${d}"><div class="row-main"><p class="t-body">${mdLong(d)} 週${wd(d)}</p><p class="t-caption c2">${esc(s.items.filter(i=>i.sets.some(isDone)).map(i=>i.name).join('、'))}</p></div><p class="row-end t-callout c2 num">${volTxt(st.vol)}</p><span class="chev">${IC.chevR}</span></button>`}).join('')}</div></section>`;
+      return `<button class="row" data-act="progex" data-name="${esc(n)}"><div class="row-main">
+        <p class="t-body">${esc(n)}</p>
+        <p class="t-caption c2">${md(l.date)}${p?deltaTag(dv):'　第一次紀錄'}</p></div>
+        <div class="row-end"><p class="t-callout num">${showW(l.top)} <span class="c2 t-caption">${U()}</span></p></div><span class="chev">${IC.chevR}</span></button>`}).join('')}</div>`).join('')}</section>
+  <section class="sec"><div class="sec-h"><h2 class="t-h3">訓練紀錄</h2>${(dates.length?dates:sessionDates()).length>30?`<span class="t-caption c2">共 ${(dates.length?dates:sessionDates()).length} 筆</span>`:''}</div>
+    <div class="group">${(()=>{const ds=(dates.length?dates:sessionDates()).slice().reverse(),shown=ui.allLog?ds:ds.slice(0,30);
+      return shown.map(d=>{const s=S.sessions[d],st=sessionStats(s);
+        return `<button class="row" data-act="openday" data-d="${d}"><div class="row-main"><p class="t-body">${mdLong(d)} 週${wd(d)}</p><p class="t-caption c2">${esc(s.items.filter(i=>i.sets.some(isDone)).map(i=>i.name).join('、'))}</p></div><p class="row-end t-callout c2 num">${volTxt(st.vol)}</p><span class="chev">${IC.chevR}</span></button>`}).join('')
+      +(ds.length>shown.length?`<button class="row" data-act="logall"><span class="row-main t-body" style="color:var(--primary)">顯示全部 ${ds.length} 筆</span></button>`:'')})()}</div></section>`;
   if(dates.length){
     const o=baseOpts();o.scales.x.stacked=true;o.scales.y.stacked=true;o.plugins.tooltip.displayColors=true;o.plugins.tooltip.boxPadding=4;
     mk('cWk',{type:'bar',data:{labels:wk.map(md),datasets:used.map(c=>({label:c,data:wk.map(k=>Math.round(fromKg(weeks[k].cat[c]||0,U()))),backgroundColor:catColor(c),borderRadius:2,maxBarThickness:22,borderColor:cssv('surface'),borderWidth:{top:1}}))},options:o});
@@ -1067,16 +1193,16 @@ function renderProgDetail(){
     <div><p class="t-label c2">最重一組</p><p class="t-h2 num">${showW(a.top)}<span class="t-callout c2"> ${U()}×${a.topReps}</span></p><p class="t-caption c3">${md(a.date)}</p></div>
     <div><p class="t-label c2">估算 1RM</p><p class="t-h2 num">${showW(b.e1rm)}<span class="t-callout c2"> ${U()}</span></p><p class="t-caption c3">${md(b.date)}</p></div>
     <div><p class="t-label c2">單次總量</p><p class="t-h2 num">${showW(c.vol,0)}<span class="t-callout c2"> ${U()}</span></p><p class="t-caption c3">${md(c.date)}</p></div></div>`
-  :`<div class="empty"><p class="t-callout c2">還沒有完成的組。</p></div>`}
-  ${all.length?`<div style="margin-top:24px">${rangeSeg()}</div>`:''}
-  ${h.length===1?`<p class="t-callout c2" style="margin:16px 4px 0">再記錄一次這個動作，就會出現進步曲線。</p>`:''}
-  ${h.length?`${h.length>1?`<section class="sec" style="margin-top:24px"><div class="sec-h"><h2 class="t-h3">重量</h2><span class="t-caption c2">實線為最重一組，虛線為估算 1RM</span></div>
+  :`<div class="empty compact"><span class="empty-ic" aria-hidden="true">${IC.tProg}</span><p class="t-h3">還沒有完成的組</p><p class="t-callout c2">在訓練頁勾選完成的組之後，這裡會出現最重一組、1RM 與訓練量。</p></div>`}
+  ${all.length?`<div class="sec">${rangeSeg()}</div>`:''}
+  ${h.length===1?`<p class="t-callout c2" style="margin:var(--s4) var(--s1) 0">再記錄一次這個動作，就會出現進步曲線。</p>`:''}
+  ${h.length?`${h.length>1?`<section class="sec"><div class="sec-h"><h2 class="t-h3">重量</h2><span class="t-caption c2">實線為最重一組，虛線為估算 1RM</span></div>
     <div class="group pad"><div class="cw"><canvas id="cE" aria-label="重量趨勢"></canvas></div></div></section>
   <section class="sec"><div class="sec-h"><h2 class="t-h3">訓練量</h2><span class="t-caption c2">重量 × 次數，${U()}</span></div>
     <div class="group pad"><div class="cw" style="height:160px"><canvas id="cV" aria-label="訓練量"></canvas></div></div></section>`:''}
-  <section class="sec"${h.length>1?'':' style="margin-top:24px"'}><div class="sec-h"><h2 class="t-h3">每次紀錄</h2></div><div class="group">${h.slice().reverse().map(x=>
+  <section class="sec"><div class="sec-h"><h2 class="t-h3">每次紀錄</h2></div><div class="group">${h.slice().reverse().map(x=>
     `<button class="row" data-act="openday" data-d="${x.date}"><div class="row-main"><p class="t-body">${mdLong(x.date)} 週${wd(x.date)}</p><p class="t-caption c2">${esc(setsText(x.sets,n))}</p></div><p class="row-end t-callout num">${showW(x.top)} ${U()}</p></button>`).join('')}</div></section>`
-  :all.length?`<div class="empty"><p class="t-callout c2">這段期間沒有做這個動作。</p></div>`:''}`;
+  :all.length?`<div class="empty compact"><span class="empty-ic" aria-hidden="true">${IC.tProg}</span><p class="t-h3">這段期間沒有做這個動作</p><p class="t-callout c2">把上面的時間範圍改成「全部」，就會看到更早的紀錄。</p></div>`:''}`;
   if(h.length<2)return;
   const L=h.map(x=>md(x.date)),p=cssv('primary');
   mk('cE',{type:'line',data:{labels:L,datasets:[line('最重一組',h.map(x=>r1(fromKg(x.top,U()))),p,lastPoint(h.length)),line('估算 1RM',h.map(x=>r1(fromKg(x.e1rm,U()))),cssv('text-3'),{borderDash:[4,4],borderWidth:1.5})]},options:baseOpts()});
@@ -1101,23 +1227,27 @@ function renderBody(){
   const compSeries=Object.keys(S.body).sort().filter(inRange).filter(d=>S.body[d].fatPct!=null||S.body[d].muscle!=null);
   app.innerHTML=`${header('身體')}
   ${backupNotice()}
-  <div class="group pad">
+  <div class="group pad" style="padding-top:var(--s5)">
     ${cur?`<p class="t-label c2">體重</p>
-      <div class="metric-v"><span class="t-display num">${fmt(bShow('weight',cur.v))}</span><span class="t-h3 c2">${U()}</span></div>
-      <p class="t-callout c2 num">${dl?`較 ${md(dl.ref.d)} ${dl.dv>0?'+':dl.dv<0?'−':'±'}${fmt(Math.abs(bShow('weight',dl.dv)))} ${U()}　`:''}${md(cur.d)} 量測${bmi?`　BMI ${fmt(bmi)}`:''}</p>
-      ${ws.length>1?`<div style="margin-top:20px">${rangeSeg()}</div>${inR.length>1?`<div class="cw" style="height:160px;margin-top:16px"><canvas id="cW" aria-label="體重趨勢"></canvas></div>`:`<p class="t-callout c2" style="margin-top:16px">這段期間只有一筆紀錄。</p>`}`:''}`
-    :`<p class="t-h3">還沒有體重紀錄</p><p class="t-callout c2" style="margin-top:4px">記下今天的體重，趨勢圖就會開始累積。</p>`}
-    <div class="btn-row" style="margin-top:20px"><button class="btn btn-primary" data-act="weigh">記錄體重</button><button class="btn btn-secondary" data-act="inbody" data-d="${todayStr()}">InBody 量測</button></div>
+      <div class="metric-v"><span class="metric-n num">${fmt(bShow('weight',cur.v))}</span><span class="t-h3 c2">${U()}</span></div>
+      <p class="metric-meta t-callout c2">${md(cur.d)} 量測${bmi?`　BMI <span class="num">${fmt(bmi)}</span>`:''}${
+        dl?(Math.abs(bShow('weight',dl.dv))<.05?'　體重持平':`　<span class="delta ${dl.dv>0?'up':'down'}">${dl.dv>0?'▲':'▼'}${NB}${fmt(Math.abs(bShow('weight',dl.dv)))}${NB}${U()}</span> 較 ${md(dl.ref.d)}`):''}</p>
+      ${ws.length>1?`<div style="margin-top:var(--s5)">${rangeSeg()}</div>${inR.length>1?`<div class="cw" style="height:160px;margin-top:var(--s4)"><canvas id="cW" aria-label="體重趨勢"></canvas></div>`:`<p class="t-callout c2" style="margin-top:var(--s4)">這段期間只有一筆紀錄。</p>`}`:''}`
+    :`<div class="empty compact"><span class="empty-ic" aria-hidden="true">${IC.tBody}</span><p class="t-h3">還沒有體重紀錄</p><p class="t-callout c2">記下今天的體重，趨勢圖就會開始累積。</p></div>`}
+    <div class="btn-row mt-5"><button class="btn btn-primary" data-act="weigh">記錄體重</button><button class="btn btn-secondary" data-act="inbody" data-d="${todayStr()}">InBody 量測</button></div>
   </div>
   ${comp.length?`<section class="sec"><div class="sec-h"><h2 class="t-h3">身體組成</h2></div><div class="group">${comp.map(({k,sr})=>{
       const c=sr[sr.length-1],p=sr[sr.length-2],dv=p?bShow(k,c.v)-bShow(k,p.v):null,g=goodDir[k];
-      const cls=dv==null||Math.abs(dv)<.05||!g?'c2':(Math.sign(dv)===g?'good':'bad');
-      return `<div class="row"><div class="row-main"><p class="t-body">${bLabel(k)}</p><p class="t-caption c2">${md(c.d)}${p?`　較 ${md(p.d)} <span class="${cls}">${dv>0?'+':dv<0?'−':'±'}${fmt(Math.abs(dv),k==='bmr'?0:1)}</span>`:''}</p></div><p class="row-end t-body num">${fmt(bShow(k,c.v),k==='bmr'?0:1)} <span class="t-callout c2">${bUnit(k)}</span></p></div>`}).join('')}</div>
-    ${compSeries.length>1?`<div class="group pad" style="margin-top:12px"><p class="t-caption c2" style="display:flex;gap:16px"><span><i style="display:inline-block;width:12px;height:2px;background:var(--primary);vertical-align:middle;margin-right:6px"></i>骨骼肌 ${U()}</span><span><i style="display:inline-block;width:12px;height:0;border-top:2px dashed var(--warning);vertical-align:middle;margin-right:6px"></i>體脂率 %</span></p><div class="cw" style="height:180px;margin-top:12px"><canvas id="cC" aria-label="身體組成趨勢"></canvas></div></div>`:''}
+      const dp=k==='bmr'?0:1, flat=dv==null||Math.abs(dv)<Math.pow(10,-dp)/2;
+      const cls=flat||!g?'c2':(Math.sign(dv)===g?'good':'bad');
+      return `<div class="row"><div class="row-main"><p class="t-body">${bLabel(k)}</p><p class="t-caption c2">${md(c.d)}${p?`　較 ${md(p.d)} <span class="${cls}">${flat?'± 持平':(dv>0?'+':'−')+fmt(Math.abs(dv),dp)+NB+bUnit(k)}</span>`:''}</p></div><p class="row-end t-body num">${fmt(bShow(k,c.v),dp)} <span class="t-callout c2">${bUnit(k)}</span></p></div>`}).join('')}</div>
+    ${compSeries.length>1?`<div class="group pad" style="margin-top:var(--s3)"><p class="cat-legend" style="margin-top:0"><span class="t-caption"><i class="ln"></i>骨骼肌${NB}${U()}</span><span class="t-caption"><i class="ln dash"></i>體脂率 %</span></p><div class="cw" style="height:180px;margin-top:var(--s3)"><canvas id="cC" aria-label="身體組成趨勢"></canvas></div></div>`:''}
   </section>`:''}
-  ${keys.length?`<section class="sec"><div class="sec-h"><h2 class="t-h3">量測紀錄</h2></div><div class="group">${keys.slice(0,40).map(k=>{const r=S.body[k];
-    const bits=[r.fatPct!=null?`體脂 ${fmt(r.fatPct)}%`:'',r.muscle!=null?`骨骼肌 ${fmt(bShow('muscle',r.muscle))} ${U()}`:''].filter(Boolean).join('　');
-    return `<button class="row" data-act="inbody" data-d="${k}"><div class="row-main"><p class="t-body">${mdLong(k)} 週${wd(k)}</p>${bits?`<p class="t-caption c2">${bits}</p>`:''}</div><p class="row-end t-callout num">${r.weight!=null?`${fmt(bShow('weight',r.weight))} ${U()}`:''}</p><span class="chev">${IC.chevR}</span></button>`}).join('')}</div></section>`:''}`;
+  ${keys.length?`<section class="sec"><div class="sec-h"><h2 class="t-h3">量測紀錄</h2>${keys.length>40?`<span class="t-caption c2">共 ${keys.length} 筆</span>`:''}</div><div class="group">${(()=>{const shown=ui.allBody?keys:keys.slice(0,40);
+    return shown.map(k=>{const r=S.body[k];
+      const bits=[r.fatPct!=null?`體脂 ${fmt(r.fatPct)}%`:'',r.muscle!=null?`骨骼肌 ${fmt(bShow('muscle',r.muscle))}${NB}${U()}`:''].filter(Boolean).join('　');
+      return `<button class="row" data-act="inbody" data-d="${k}"><div class="row-main"><p class="t-body">${mdLong(k)} 週${wd(k)}</p>${bits?`<p class="t-caption c2">${bits}</p>`:''}</div><p class="row-end t-callout num">${r.weight!=null?`${fmt(bShow('weight',r.weight))}${NB}${U()}`:''}</p><span class="chev">${IC.chevR}</span></button>`}).join('')
+      +(keys.length>shown.length?`<button class="row" data-act="bodyall"><span class="row-main t-body" style="color:var(--primary)">顯示全部 ${keys.length} 筆</span></button>`:'')})()}</div></section>`:''}`;
   if(inR.length>1)mk('cW',{type:'line',data:{labels:inR.map(p=>md(p.d)),datasets:[line('體重',inR.map(p=>r1(bShow('weight',p.v))),cssv('primary'),lastPoint(inR.length))]},options:baseOpts()});
   if(compSeries.length>1){
     const o=baseOpts();o.scales.y2={position:'right',ticks:{color:cssv('text-3'),maxTicksLimit:4,font:{family:cssv('font'),size:13}},grid:{display:false},border:{display:false}};
@@ -1132,7 +1262,7 @@ function openWeight(){
     <label class="fl"><span class="t-label">日期</span><input type="date" id="wDate" class="field" value="${d}" required></label>
     <label class="fl"><span class="t-label">體重</span><span class="unitfield"><input id="wVal" inputmode="decimal" enterkeyhint="done" value="${rec.weight!=null?r1(bShow('weight',rec.weight)):''}" placeholder="${prev?r1(bShow('weight',prev.v)):'0'}"><span>${U()}</span></span>
       ${prev?`<span class="hint t-caption c3">上次 ${md(prev.d)}：${fmt(bShow('weight',prev.v))} ${U()}</span>`:''}</label></div>
-    <button class="btn btn-primary btn-block" style="margin-top:24px" data-act="saveweight">儲存</button>`,
+    <div class="savebar"><button class="btn btn-primary btn-block" data-act="saveweight">儲存</button></div>`,
     ()=>{const v=$('#wVal');setTimeout(()=>v.focus(),320);v.addEventListener('keydown',e=>{if(e.key==='Enter')saveWeight()})});
 }
 function saveWeight(){
@@ -1145,11 +1275,11 @@ function openInbody(d){
   const val=k=>rec[k]!=null?r1(bShow(k,rec[k])):'';
   openSheet(S.body[d]?'量測紀錄':'InBody 量測',`<div class="group pad">
     <label class="fl"><span class="t-label">日期</span><input type="date" id="bDate" class="field" value="${d}" required></label>
-    <div class="fgrid" style="margin-top:20px">${BODY_FIELDS.map(([k,l])=>`<label class="fl"><span class="t-label">${l}</span>
+    <div class="fgrid mt-5">${BODY_FIELDS.map(([k,l])=>`<label class="fl"><span class="t-label">${l}</span>
       <span class="unitfield"><input id="f-${k}" inputmode="decimal" value="${val(k)}" placeholder="${pv[k]!=null?r1(bShow(k,pv[k])):''}"><span>${bUnit(k)}</span></span></label>`).join('')}</div>
-    <p class="t-caption c3" style="margin-top:12px">只填有量的欄位。灰色數字是上一次的紀錄。</p></div>
-    <button class="btn btn-primary btn-block" style="margin-top:24px" data-act="savebody" data-orig="${S.body[d]?d:''}">儲存</button>
-    ${S.body[d]?`<button class="btn btn-destructive btn-block" style="margin-top:8px" data-act="delbody" data-d="${d}">刪除這筆紀錄</button>`:''}`);
+    <p class="t-caption c3" style="margin-top:var(--s3)">只填有量的欄位。灰色數字是上一次的紀錄。</p></div>
+    <div class="savebar"><button class="btn btn-primary btn-block" data-act="savebody" data-orig="${S.body[d]?d:''}">儲存</button>
+    ${S.body[d]?`<button class="btn btn-destructive btn-block" data-act="delbody" data-d="${d}">刪除這筆紀錄</button>`:''}</div>`);
 }
 function saveInbody(orig){
   const d=$('#bDate').value;if(!d){toast('請選擇日期');return}
@@ -1181,7 +1311,7 @@ function backupNotice(){
   if(!backupDue())return '';
   try{const s=localStorage.getItem(SNOOZE_K);if(s&&todayStr()<s)return ''}catch{}
   const msg=S.meta.lastBackup?`已經 ${daysSince(S.meta.lastBackup)} 天沒有備份`:'還沒有備份過資料';
-  return `<div class="group" style="margin-bottom:16px"><div class="notice"><span class="t-callout">${msg}</span>
+  return `<div class="group mb-4"><div class="notice"><span class="t-callout">${msg}</span>
     <span style="display:flex;align-items:center;flex:none"><button class="btn btn-plain" data-act="export">匯出</button><button class="btn btn-plain" data-act="snoozebackup" style="color:var(--text-2)">稍後</button></span></div></div>`;
 }
 function openSettings(){
@@ -1189,18 +1319,18 @@ function openSettings(){
     <div class="group">
       <div class="row"><span class="row-main t-body">顯示單位</span><div class="seg" style="width:120px">${['kg','lb'].map(u=>`<button data-act="unit" data-u="${u}" aria-pressed="${U()===u}">${u}</button>`).join('')}</div></div>
       <label class="row"><span class="row-main t-body">身高</span><span class="unitfield" style="width:120px"><input id="hIn" inputmode="decimal" value="${S.meta.height??''}" placeholder="—" style="text-align:right;font-size:17px"><span>cm</span></span></label>
-      <label class="row"><span class="row-main t-body">預設組間休息</span><select id="restDef" class="field" style="width:120px;min-height:40px">${REST_OPTS.map(s=>`<option value="${s}" ${(S.meta.rest||90)===s?'selected':''}>${fmtSec(s)}</option>`).join('')}</select></label>
+      <label class="row"><span class="row-main t-body">預設組間休息</span><select id="restDef" class="field" style="width:120px;min-height:var(--h-control)">${REST_OPTS.map(s=>`<option value="${s}" ${(S.meta.rest||90)===s?'selected':''}>${fmtSec(s)}</option>`).join('')}</select></label>
       <label class="row"><span class="row-main"><span class="t-body" style="display:block">完成一組後自動計時</span><span class="t-caption c2">關閉時從下方工具列手動開始</span></span><span class="toggle"><input type="checkbox" id="autoRest" ${S.meta.autoRest===true?'checked':''}><span></span></span></label>
     </div>
-    <div class="group" style="margin-top:24px">
+    <div class="group">
       <button class="row" data-act="openlib"><span class="row-main t-body">動作庫</span><span class="row-end t-callout c2">${Object.keys(S.meta.exercises).length}</span><span class="chev">${IC.chevR}</span></button>
     </div>
-    <div class="group" style="margin-top:24px">
+    <div class="group">
       <button class="row" data-act="export"><span class="row-main t-body" style="color:var(--primary)">匯出備份</span></button>
       <label class="row" style="cursor:pointer"><span class="row-main t-body" style="color:var(--primary)">匯入備份</span><input type="file" id="imp" accept=".json,application/json" class="vh"></label>
     </div>
-    <p class="t-caption ${backupDue()?'':'c2'}" style="margin:12px 4px 0;${backupDue()?'color:var(--warning)':''}" id="bkInfo">${backupText()}</p>
-    <p class="t-caption c3" style="margin:4px 4px 0">資料只存在這台裝置，刪除 App 會一併刪除，建議定期匯出備份到「檔案」。重量以公斤保存，切換單位不會失真。</p>`,
+    <p class="t-caption ${backupDue()?'':'c2'}" style="margin:var(--s3) var(--s1) 0;${backupDue()?'color:var(--warning)':''}" id="bkInfo">${backupText()}</p>
+    <p class="t-caption c3" style="margin:var(--s1) var(--s1) 0">資料只存在這台裝置，刪除 App 會一併刪除，建議定期匯出備份到「檔案」。重量以公斤保存，切換單位不會失真。</p>`,
   ()=>{
     $('#hIn').addEventListener('change',e=>{S.meta.height=num(e.target.value);saveMeta();render()});
     $('#restDef').addEventListener('change',e=>{S.meta.rest=+e.target.value;saveMeta();updateDock()});
@@ -1320,6 +1450,8 @@ document.body.addEventListener('click',e=>{
     case 'rescueblank': rescueBlank();break;
     case 'snoozebackup': try{localStorage.setItem(SNOOZE_K,addDays(todayStr(),3))}catch{}render();break;
     case 'range': ui.range=+b.dataset.n;render();break;
+    case 'logall': ui.allLog=true;render();break;
+    case 'bodyall': ui.allBody=true;render();break;
     case 'calmonth':{const [y,m]=ui.calMonth.split('-').map(Number),x=new Date(y,m-1+(+b.dataset.n),1);ui.calMonth=ymd(x).slice(0,7);render();break}
   }
 });
@@ -1335,13 +1467,15 @@ app.addEventListener('keydown',e=>{
 });
 /* swipe a set row left to reveal delete */
 let sw=null;
+/* distances come from the same tokens the CSS uses, so the two can never drift apart */
+const setDelW=()=>parseFloat(cssv('set-del-w'))||88, setSwipeMax=()=>parseFloat(cssv('set-swipe-max'))||112;
 app.addEventListener('touchstart',e=>{const r=e.target.closest('.set');if(!r)return;closeSwipes(r);
-  sw={r,x0:e.touches[0].clientX,y0:e.touches[0].clientY,dx:0,lock:null,base:r.classList.contains('open')?-88:0}},{passive:true});
+  sw={r,x0:e.touches[0].clientX,y0:e.touches[0].clientY,dx:0,lock:null,base:r.classList.contains('open')?-setDelW():0}},{passive:true});
 app.addEventListener('touchmove',e=>{if(!sw)return;const t=e.touches[0],dx=t.clientX-sw.x0,dy=t.clientY-sw.y0;
   if(sw.lock==null&&(Math.abs(dx)>8||Math.abs(dy)>8))sw.lock=Math.abs(dx)>Math.abs(dy)?'x':'y';
-  if(sw.lock!=='x')return;e.preventDefault();sw.dx=dx;sw.r.style.transition='none';sw.r.style.transform=`translateX(${Math.min(0,Math.max(-112,sw.base+dx))}px)`},{passive:false});
+  if(sw.lock!=='x')return;e.preventDefault();sw.dx=dx;sw.r.style.transition='none';sw.r.style.transform=`translateX(${Math.min(0,Math.max(-setSwipeMax(),sw.base+dx))}px)`},{passive:false});
 app.addEventListener('touchend',()=>{if(!sw)return;const r=sw.r;r.style.transition='';r.style.transform='';
-  if(sw.lock==='x')r.classList.toggle('open',sw.base+sw.dx<-44);sw=null});
+  if(sw.lock==='x')r.classList.toggle('open',sw.base+sw.dx<-setDelW()/2);sw=null});
 /* ---- 進度 → 動作詳細: back returns to the same scroll position; swipe right to go back ----
    The list is snapshotted when you open an exercise (charts as images), so the swipe can reveal it underneath. */
 let backSnap=null;
@@ -1418,23 +1552,28 @@ function migrate(){
   const orphans=Object.keys(m.exercises).filter(n=>useCount(n)===0&&!m.exercises[n].note);
   if(orphans.length){orphans.forEach(n=>delete m.exercises[n]);saveMeta()}
 }
-/* the saved value could not be parsed: stop here, keep it untouched, and let the user export it before anything writes */
+/* the saved value could not be parsed, or the store threw: stop here, keep it untouched,
+   and give both failure paths the same way out (export what survived, or start over after a confirm) */
 let rescue=null;
 function renderRescue(){
   $('#bars').hidden=true;
+  document.body.classList.remove('has-dock');
   app.removeAttribute('aria-busy');
+  const raw=rescue?.raw??null;
+  /* no gear here: the settings sheet can save, and nothing may write while the data is unread */
   app.innerHTML=`<header class="ph"><div class="ph-row"><h1 class="t-display">資料讀取失敗</h1></div></header>
     <div class="group"><div class="pad">
-      <p class="t-body">這台裝置上的紀錄無法讀取，可能是儲存時中斷造成。原始資料已保留，尚未被覆蓋。</p>
-      <p class="t-callout c2" style="margin-top:var(--s2)">${rescue.key?`原始資料也另存了一份（<span class="num">${esc(rescue.key)}</span>）。`:'原始資料目前還留在原本的位置。'}建議先匯出，需要時可交給備份檔案之外的副本保存。</p>
+      <div class="notice bad" style="margin:0 0 var(--s3);padding-left:var(--s3)"><span class="t-body">這台裝置上的紀錄讀不出來，可能是儲存時中斷造成。App 沒有寫入任何東西，原本的資料還在。</span></div>
+      <p class="t-callout c2" style="margin-top:var(--s2)">${rescue?.key?`原始文字另存了一份（<span class="num">${esc(rescue.key)}</span>）。`:''}${raw?'建議先匯出，交給備份檔案以外的副本保存。':'如果開不起來的情況一直發生，可以嘗試重新開啟 App。'}</p>
     </div></div>
     <div class="group" style="margin-top:var(--s4)">
-      <button class="row" data-act="rescuedl"><span class="row-main t-body" style="color:var(--primary)">匯出原始資料</span></button>
+      ${raw?`<button class="row" data-act="rescuedl"><span class="row-main t-body" style="color:var(--primary)">匯出原始資料</span></button>`:''}
       <button class="row" data-act="rescueblank"><span class="row-main t-body" style="color:var(--error)">以空白資料開啟</span></button>
     </div>
-    <p class="t-caption c3" style="margin:var(--s3) var(--s1) 0">選「以空白資料開啟」會蓋掉這份無法讀取的資料，之後只能從匯出的檔案救回。</p>`;
+    <p class="t-caption c3" style="margin:var(--s3) var(--s1) 0">「以空白資料開啟」會蓋掉這份讀不出來的資料，之後只能從匯出的檔案救回。</p>`;
 }
 async function rescueExport(){
+  if(!rescue?.raw){toast('沒有可匯出的原始資料');return}
   const r=await saveFile(rescue.raw,`別肌動原始資料-${todayStr()}.txt`,'text/plain');
   if(r==='ok')toast('已匯出原始資料');
   else if(r==='fail')toast('沒有匯出，請再試一次');
@@ -1463,7 +1602,8 @@ async function boot(){
   try{const d=await store.load();
     if(d?.corrupt){rescue=d;renderRescue();return}
     if(d)S={meta:Object.assign({height:null,unit:'kg',rest:90,autoRest:false,exercises:{}},d.meta||{}),sessions:d.sessions||{},body:d.body||{}}}
-  catch(e){console.warn(e);app.innerHTML=`<div class="empty"><p class="t-h3">讀取資料失敗</p><p class="t-callout c2">請關閉 App 後重新開啟。</p></div>`;return}
+  /* the store itself threw (not a corrupt value): same rescue screen, so there is still an export path */
+  catch(e){console.warn(e);rescue={corrupt:true,raw:null,key:null,reason:'load'};renderRescue(e);return}
   migrate();
   const ls=S.sessions[todayStr()]?.items;if(ls?.length)ui.lastEx=ls[ls.length-1].name;
   render();

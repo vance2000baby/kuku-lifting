@@ -145,6 +145,7 @@ S = {
 - **尺寸**：`--h-control` 44（最小觸控）、`--h-input` 48、`--h-button` 50、`--h-tabrow` 50；圖示 `--icon-xs/sm/-/lg` = 18/20/22/24。
 - **動態**：`--dur-1/2/3`（.15/.25/.38s）＋`--ease`（無回彈）；sheet 用 `--ease-sheet`。按壓回饋用底色或透明度，不用放大縮小（勾選圓圈的輕微縮放除外）。`prefers-reduced-motion` 時全部關閉。
 - **元件**：`.btn`（primary／secondary／plain／destructive／danger）、`.iconbtn`、`.group` + `.row`、`.seg`、`.choices`、`.field`、`.unitfield`、`.toggle`、`openSheet()` / `actionSheet()`、`toast()`、`askConfirm()`、`.empty`、`.notice`。新畫面請重用這些元件。
+- **空狀態只有一種寫法**（`renderRescue()` 也用同一組）：全頁空狀態用 `.empty` + `.empty-ic` 插圖 + `.t-h3` 標題 + 一句 `.t-callout c2` 引導；卡片或 sheet 裡用 `.empty.compact`。不要另外造 `empty-inline` 這類變體。
 - **表單**：兩欄 grid 一律 `repeat(2,minmax(0,1fr))`，否則輸入框的預設寬度會把右欄擠出手機畫面。日期輸入框都加 `required`（iOS 日期選擇器才不會出現「重置」），清空時會還原。
 - **觸控**：觸控目標至少 44px。頁面只能垂直捲動：`html` 設定 `touch-action: manipulation` 和 `overflow-x: clip`，`.set` 設定 `touch-action: pan-y`，左滑刪除由 JS 處理。
 
